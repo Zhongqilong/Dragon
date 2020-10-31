@@ -48,3 +48,4 @@
 * [https://zhuanlan.zhihu.com/p/70123645] (GPU instancing)
 * [https://www.jianshu.com/p/1492611bb432] (GPU instancing)
 * [https://www.jianshu.com/p/a3087f31ff88] (Unity动态合批 静态合批)
+* [https://github.com/XINCGer/Unity3DTraining/blob/master/PerformanceOptimization/UWA.md] (*****UWA厚积薄发相关优化文档*****)

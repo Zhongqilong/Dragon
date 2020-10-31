@@ -55,8 +55,7 @@ MMORPG手游的Draw Call数量普遍较高，且设备性能越好，数量峰�
 2）特效中是否含有长久不用的粒子系统。
 
 GPU Instancing
-批渲染Mesh相同的那些物体，以降低DrawCall数
-这些物体可以有不同的参数，比如颜色与缩放
+批渲染Mesh相同的那些物体，以降低DrawCall数，这些物体可以有不同的参数，比如颜色与缩放
 
 GPU Instancing与静态批处理，动态批处理的区别
 使用静态，动态批处理物体的材质的所有参数是相同的，因为使用Renderer.sharedMaterial修改参数，则所有物体都会受影响。而使用Renderer.material会生成新实例，没法进行批处理
@@ -68,3 +67,113 @@ GPU Instancing与静态批处理，动态批处理的区别
 4.对于半透明的GameObject，按照从前到后的顺序绘制，Unity首先按这个顺序对GameObjects进行排序，然后尝试对它们进行批处理，但由于必须严格满足顺序，这通常意味着对于半透明的材质更少使用合批处理。
 5.手动的合并GameObject是代替合批处理的好办法，比如使用Mesh.CombineMeshes，或者直接在建模时将多个网格合并成单个网格。
 
+静态批处理
+原理：在Build的时候Unity会自动地提取这些共享材质的静态模型的Vertex buffer和Index buffer。将这些模型的顶点数据变换到世界空间下，存储在新构建的大Vertex buffer和Index buffer中。并且记录每一个子模型的Index buffer数据在构建的大Index buffer中的起始及结束位置。绘制的时候一次行提交合并模型的顶点数据，根据每个的，模型的可见性，调用多次DC，但是只改变一次渲染状态，之前的DC命令在Command Buffer缓存中
+优点：减少CPU压力和时间
+缺点：包体变大，内存变大；
+
+
+动态批处理：
+原理：在进行场景绘制之前将所有的共享同一材质的模型的顶点信息变换到世界空间中，然后通过一次Draw call绘制多个模型，达到合批的目的。模型顶点变换的操作是由CPU完成的，所以这会带来一些CPU的性能消耗。并且计算的模型顶点数量不宜太多，否则CPU串行计算耗费的时间太长会造成场景渲染卡顿，所以Dynamic batching只能处理一些小模型。
+限制：1.材质相同
+2.最高支持900个顶点属性，也就是最大300个顶点；
+3.多Pass的shader会中断批处理。
+4.在unity5后，动态批处理对于模型缩放的限制已经不存在了。
+5.使用光照纹理的物体需要小心处理。为了让这些物体可以被动态批处理，需要保证它们指向光照纹理中的同一位置
+
+然后xLua本身也提供了删除引用的处理LuaEnv.Tick()函数（慢慢遍历检测，引用的C#对象是否销毁，已销毁了就置null，可以解引用，后面GC就会被GC掉）调用了，且提高每次遍历的数目。
+
+C#栈可以通过StackTraceUtility.ExtractStackTrace()拿到；
+Lua栈可以通过DoString(“return debug.traceback()”)拿到；
+可以把这两个字符串和obj一起记录在ObjectPool里，这样只要知道是哪个obj泄露了，也就顺便知道是哪里引入的了。
+
+Q：想对UGUI渲染优化，发现这个问题。例如一个界面的Scrollview有很多Item，发现当UI根节点的Z为0时，会合批处理。当Z不为0的时候，Item会一个一个地绘制出来，没有合批处理。求大佬给萌新科普一下，遇见这种情形应该怎么处理比较好？谢谢啦！
+A：“UI元素Position的Z值不为0时，会被视为3D UI，不参与合批。父节点Z != 0，则下面的元素都无法合批了。”
+
+
+最近手上的游戏2D序列帧用得比较多， 此时使用ETC2和PVRTC因为压缩的原因，会产生闪的问题。使用拆Alpha通道的方式可以一定程度上避免，特别是对于带Alpha通道的图，ETC2质量低的原因大半在于对Alpha的压缩。
+ASTC的质量是明显好于PVRTC的，iPhone上唯一的问题是iPhone 5s的支持。我们的方案是，如果机型不支持ASTC，会额外准备一份低质量的PVRTC的资源，尺寸是原图的一半，而设计的主要目的是解决内存问题，顺带解决iPhone 5s的压缩问题。
+如果GameObject销毁了，但其Component仍然在不断存在，且不断上升，很有可能是你的的Lua导致了泄露。
+通过Inspector里面的Show Generated Code按钮查看编译后的代码
+Q：游戏在其他手机上都正常，但是在小米MIX 2上面默认右边有黑条，需要在手机上开启全面屏设置，但是有一些游戏我没有手动设置也是正确的。请问这个如何默认开启全面屏设置？
+
+A：在AndroidManifest.xml声明max_aspect值
+由于全面屏手机的高宽比比之前大，如果不适配的话，Android默认为最大的宽高比是1.86，小于全面屏手机的宽高比，因此，在全面屏手机上打开部分App时，上下就会留有空间，显示为黑条。这样非常影响视觉体验，另外全面屏提供的额外空间也没有得以利用，因此，这样的应用需要做相关适配。
+针对此问题，Android官方提供了适配方案，即提高App所支持的最大屏幕纵横比，实现起来也比较简单，在AndroidManifest.xml中做如下配置即可：
+< meta-data android:name=“android.max_aspect” android:value=“ratio_float”/ >
+其中ratio_float为浮点数，官方建议为2.1或更大，因为18.5:9=2.055555555……，如果日后出现纵横比更大的手机，此值将需要设为更大。
+因此，建议开发者在自己App AndroidManifest的Application标签下面增加下面一段代码：
+< meta-data android:name=“android.max_aspect” android:value=“2.1” / >
+
+Unity很多内置继承自UnityEngine.Object的对象如Texture、Component等，有C#和C++ 两部分内容。
+以Texture为例，C#这边就是一个Wrapper，真正的纹理数据在C++ 那边。当主动执行Resources.Unlaod之后，C++ 部分被销毁，但是C#部分由于被static容器引用没有得到释放，就会造成泄露。
+查询泄露简单的办法就是在ObjectTranslator中找到相关容器进行遍历，如果发现：
+if(obj == null && (obj as System.Object != null))
+那么就可以认为C++层已经被销毁，但是C#还在残留，也就是泄露了。原理参考：UnityEngine.Object里的迷之null（http://qiankanglai.me/2016/10/21/fake-null/）。
+
+CommandBuffer作用就是在相机渲染的某个阶段，再另外执行自己的额外渲染，至于渲染的结果就看我们怎么用了。
+
+在设备上Shader的加载其实并不慢，通常慢在编译上，也就是Warmup做的事情。因为不同设备GPU以及驱动不一样，因此手游上的Shader是没办法在打包的时候编译的，这就需要到设备上进行编译。（说到这个，我其实也不是很清楚在打包过程中观察到的Shader编译是在干嘛。大约是把Unity自己的Shader格式转换成目标平台的Shader格式，比如：GLSL等，这也的确是一种编译。）ShaderVariantCollection要能够有针对性地提预热（提前编译）Shader，自然是要在打包的时候根据需求收集可能用到的变体，这就和打包有了关系。至于编译，就像前面所说，打包时需要转换，到设备上才真正编译Shader。
+
+动画从FBX中切成独立的.anim文件后，这是一个从只读动画变成可读写动画的过程。
+独立的动画文件和最终发布的动画文件数据格式是不一样的，Unity会在打包的时候进行转换。在编辑器中运行游戏，如果使用的是FBX中的动画文件，Unity是直接加载最终发布形态的动画序列化数据，这些数据是在FBX导入到工程中就生成好了的，所以很快。如果使用的是独立的.anim文件，Unity加载的是这个动画源文件，需要进行数据格式转换，而文本格式的序列化文件进行反序列化时，也是极慢的，加上在Animation编辑器编辑并保存动画后，Unity还会插入原有数据量的3倍到这个动画文件中去，这也极大地拖慢了动画文件的加载速度。
+
+
+项目用Xlua，发现一个问题：
+一个UI（多些文字就容易复现）打开、销毁、再打开、再销毁…，如此多次，Mono会不停的增长，C# GC也不能完全GC掉。
+然后发现一个会降下来的现象：
+Lua GC一下，C#再GC Mono会降回去一点（但也回不到最初）。这个问题应该是两者都用了引用计数来回收， 两者不同步， 虽然Destory了对象，Lua里还没GC到，则一些被Lua引用的对象等也还在引用着。
+然后两边来回GC几次，基本可以回到原来的Mono值。
+网上看到类似问题，是ToLua的：
+http://www.manew.com/forum.php?mod=viewthread&tid=141722&extra=page%3D&page=1
+
+里面提了几个方案。做了2个调整：
+（1）尝试Lua GC频率稍微调高些；
+（2）然后XLua本身也提供了删除引用的处理LuaEnv.Tick()函数（慢慢遍历检测引用的C#对象是否销毁，已销毁了就置null，可以解引用，后面GC就会被GC掉）调用了，且提高每次遍历的数目。
+但还是有增长的情况，不知大家如何解决这类问题的？谢谢！（UI做缓存池会好一些吧？但还是有一定概率会出问题，撑大Mono的）
+PS：还有一点觉得难受，Lua和C#里泄漏的东西，很难知道到底当时是什么地方造成泄漏的。必须短时间内重复一些简单操作，才能推测大概泄漏的是什么东西，然后去对应地方找问题。
+有什么可以方便定位哪个Lua的地方应用了哪个C#的地方？或者 C#引用了Lua的哪个地方？
+比如有一些双向引用了，GC不掉，只能推测大概是哪里和哪里引用了。
+A：题主对Lua和C#内存这块理解已经非常深刻了，我们也有类似问题，我们只做了第一个处理：
+调整Lua GC的两个参数，让Lua垃圾回收更加积极，这个问题的原因是Lua这一端无法感知一个小小的UserData代表的东西在C#世界的分量，根基都错了只能无脑加快频率，这是最简单有效的办法了，参数合理代价也并不大。
+关于撑大Mono的问题，我们应该也有，还没细抠这一块。目前正常操作，Mono峰值20几兆，就先没有管。
+关于Lua引用C#，Lua这边只是拿一个索引，真正的对对象的持有是通过ObjectPool来实现的，接下来针对ObjectPool做手脚即可，分两步：
+（1）记录调用栈
+C#栈可以通过StackTraceUtility.ExtractStackTrace()拿到；
+Lua栈可以通过DoString(“return debug.traceback()”)拿到；
+可以把这两个字符串和obj一起记录在ObjectPool里，这样只要知道是哪个obj泄露了，也就顺便知道是哪里引入的了。
+（2）记录分配号
+为了查哪个obj泄露了，可以在obj入池的时候给它一个分配号，这个分配号自增，然后我们就可以打点diff了。
+比如在某一刻打点A，此时的分配号是100，在另一刻打点B，此时的分配号是150，然后一顿各种GC释放，遍历池子找出100到150之间的obj，重点分析这一部分obj的存活是否符合预期，不符合预期的把两个栈打印出来即可。
+关于C#引用Lua，这块似乎并不是重灾区，我们封装了LuaBehaviour对外使用，销毁的时候控制好，另外还有delegate也做好控制，其它的暂时没有想到。
+
+https://mp.weixin.qq.com/s/5MH6_M3sC3RvoLal500Lqw
+
+shader
+ShaderVariantCollection https://www.cnblogs.com/wbaoqing/p/9680337.html
+1.把Shader放到在ProjectSetting->Graphics->Always Include Shaders列表里,Unity就会编译所有的组合变种。
+2.把Shader放到Resources文件夹下,也会正确处理,我猜也应该是全部keyword组合都编译,有知道的同学,麻烦留言告诉我。
+
+
+A2：现在tx新上线的项目已经开始普及ASTC的使用了，所以全面选择ASTC，2019可以默认import的时候选择ASTC，尤其是对光照贴图和法线有很好的效果。Unity现在默认是6x6，也可以根据项目选择其它大小。
+模拟器虽然是opengles3，但是可能不支持astc etc2，硬件支持软件，虽然不支持astc etc2，但是可以运行指示帧数比较低。
+
+1）使用Tiled模式的Image组件：Tiled模式的Image组件可能产生过多的面片，建议进一步检查。
+2）精度过高的动画片段：建议把精度缩减到3－4位，从而降低动画片段的内存占用。
+3）未使用PCM格式的音频：未使用PCM格式的音频可能存在音质问题，建议进一步检查。
+4）Wrap模式为Repeat的纹理：Wrapmode使用了Repeat模式，容易导致贴图边缘出现杂色，建议进行检查。
+https://mp.weixin.qq.com/s/UkuxNLEP3_oHp95NbleONg
+
+视域剔除在默认渲染管线中是一定会做的，但它剔除的基本并不是以Triangle为单位，而是以GameObject为单位的，只要这个GameObject（Mesh）的包围盒与视域体有交集，就会被认为是要渲染的，所以会将其Triangle全部放入Draw Call中，并传入GPU进行渲染。因此，你会看到Statistics中显示的三角面片是很高的。
+在传入到GPU后，该Draw Call中所有的顶点都会进入Vertex Shader阶段，所以如果该Mesh是8000个Triangle，那么这8000个都要进行计算，从目前我们所优化过的游戏项目（特别是重度MMO）中可以发现，很多时候都是几万的网格顶点在这里进行计算，在中低端设备上都会造成不小的计算量。
+而你问题中说的光栅化实际上是在Vertex Shader之后，也就是要到Fragment Shader阶段，这个时候是在经过一系列操作（比如深度检测等）后将Triangle向屏幕进行投射，然后通过光栅化进行颜色计算，再经过各种Buffer之后形成最终的FrameBuffer，也就是我们最终看到的内容。
+渲染Pipeline大体上是上述过程，所以通过上面的说明，题主就可以明白，光栅化和视域剔除其实没有关系，前者是GPU部分，后者是CPU部分，功能是完全不一样的。光栅化主要根据每个Triangle在屏幕上的投影来计算颜色，跟Mesh中Triangle的前期剔除是没有关系的。Statistic中的统计没有问题，因为确实有一定数量的Triangle被传入到了GPU中。如果你的项目遇到了这种情况，那么我建议将其切成小块来进行渲染，因为从概率上来说，它可以降低渲染计算压力。希望上面的说明能对你的疑惑有所帮助。
+
+Q：请问AssetBundle.LoadAssetAsync()这个真的是异步获取资源吗？我用的是个人版Unity，这个API会阻塞主线程，是不是需要专业版才行呢？
+
+A：AssetBundle.LoadAssetAsync()在加载资源的时候，比如Prefab，它里面用到的各种Texture、Mesh以及Shader都会在子线程Worker线程中进行加载。但是加载完成后会有后处理，比如Shader.Parse是一定会在主线程处理的，Texture和Mesh需要上传到GPU。如果开了多线程渲染并使用AUP功能，非RW的Texture和Mesh的上传会在渲染线程处理；如果没开多线程渲染，那么这一部分还是会由主线程来完成。这些后处理的名字叫XXX.AwakeFromLoad，如Texture.AwakeFromLoad，当主线程触发这些回调的时候，主线程其它的Update操作就必须等这些后处理完成才能继续。
+
+还有其它的像Prefab的序列化，各种Component的序列化等也都是在主线程完成的。所以一次AssetBundle.LoadAssetAsync操作，其实并不是完全的异步，主线程中依然是要做不少工作。具体细节可以观看UWA DAY 2019年的视频，里面的讲解非常清晰：https://edu.uwa4d.com/course-intro/1/91
+https://mp.weixin.qq.com/s/LUlZ-VvjxOghMDD9X4cKZg
+
+渲染视域剔除
