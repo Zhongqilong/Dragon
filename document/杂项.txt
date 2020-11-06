@@ -177,3 +177,80 @@ A：AssetBundle.LoadAssetAsync()在加载资源的时候，比如Prefab，它里
 https://mp.weixin.qq.com/s/LUlZ-VvjxOghMDD9X4cKZg
 
 渲染视域剔除
+
+armv6 < armv7 < armv7s < arm64 < x86(ios模拟没有arm指令 android上有) 向后兼容
+ios arm64主流（放弃armv7 iphone5）
+android armv7主流
+
+adb shell dumpsys meminfo packageName
+
+关节动画  mesh skinning  gpu skin  gpu instance
+
+mul_compile shader_feature
+
+模型坐标系-->世界坐标系--->相机坐标系--->投影坐标系--->标准设备化空间-->视口变换--->光栅化阶段。
+3D渲染中的Z-fighting现象 https://zhuanlan.zhihu.com/p/78769570
+
+常规的做法确实就如你说的，不用TimeScale=0，各个地方去实现暂停，然后统一管理。 https://mp.weixin.qq.com/s/J_gGi3eBqXOl3RXFPe83SA
+
+OnDemandRendering 按需渲染
+
+uv坐标又称为纹理映射坐标(texture-mapping coordinates)，对应于每个顶点，用于确立模型表面的各个顶点的颜色采样与纹理上具体位置的对应关系。通俗来讲就是将一张图贴在模型表面，使得我们可以从“纹理”这块调色板上找到正确的颜色，来绘制模型。
+Unity一共支持4套uv，在c#API中分别叫uv、uv2、uv3和uv4。通常来说(使用c# API中的命名)，uv用于主纹理，uv2用于光照贴图(Lightmap)的采样，uv3用于实时动态光照，uv4可进行自定义 https://mp.weixin.qq.com/s/nEwWNhl3vWdPtSjXC2KySg
+
+
+在安卓手机上安装一个apk，并且运行之后，假设这个apk的包名叫com.x.y，会在安卓手机上多3个目录：
+目录1：sdcard/Android/data/com.x.y，这个目录下有一个cache目录。
+目录2：data/app/com.x.y-1，这个目录下有目录lib和目录oat，还有一个base.apk。
+目录3：data/data/com.x.y，这个目录下有有5个目录，files，shared_prefs，cache，code_cache，lib。 https://mp.weixin.qq.com/s/CYxLIBqvjumXUZ3QY0DXzg
+
+
+Q：用UWA检测AssetBundle资源冗余时，发现有17个资源冗余，但是通过对比查询Bundle的Manifest文件，发现这些冗余的资源都会单独打包成一个AssetBundle，并且没有存在于自己预设资源中，但是UWA给的结论是这份冗余的资源存在于他所在的各个预设当中，请问是怎么解？
+A：我也是当初遇到的问题，Manifest没有这个冗余，AssetBundle加载进来，内存里你也没有发现这个冗余，调用GetAllAssetNames也看不到这个冗余的名字，但是如果调用LoadAllAssets，就出现了这个冗余，非常神奇，藏的很隐秘。
+原因：Rawimage挂的Texture，ParticleSystem引用UI资源。
+冗余的危害我就不说了。
+解决方案：如果说尽量保证Rawimage的图和Prefab等资源打到一个AssetBundle，这个有点难，也很累，排查起来比较困难。
+我的解决方案：
+1. 除了Background，禁止Rawimage挂Texture，但是说实话，我的Background都做了RGBA分离，所以Rawimage挂的是Material，而Rawiamge不挂Texture是因为我们项目都是异步加载了的，尽量保证Prefab先出来，后面不重要的异步出来。
+2. 禁止粒子特效挂在到UI的Prefab上，并且写工具，禁止粒子特效的Prefab引用UI资源，由于粒子特效ParticleSystem描述文件缺失大，如果挂在UI上，还会造成Prefab可能上M数量级，影响加载速度，同时粒子特效和UIPrefab分离，也不会造成冗余。
+
+
+勾选了 include in build，bundle 中就会有一份冗余：既包含合图，又包含散图。但这种情况下，程序不需要做特殊逻辑，界面就能表现正常。（具体 runtime 是否合图，未抓帧验证）
+不勾选 include in build（正确做法）：bundle 就会只包含 atlas，以及散图信息（不是完整的散图）。游戏内使用 atlas request manager 来确保图片能正常显示，否则会错乱。 如果自己实现了资源加载的话，可能还要自己找时机做 atlas 资源卸载 https://answer.uwa4d.com/question/5f5f15739424416784ef22f8
+
+A1：先简单解释一下，Unity的Color Space为Linear时，会在最后输出阶段，进行的伽马校正（Gamma Correction），将Linear空间的像素转换为sRGB空间。Gamma Correction会将颜色的亮度变大（补偿），Unity会将补偿后的像素值输出给显示设备（UWA的Effect Scanning工具会输出到RenderTexture上）。
+
+优化背包刷新机制 https://mp.weixin.qq.com/s/WX_AMyq7QJ6CF8U72C_WlQ
+
+大概知道Auto Graphics API是判断设备是否支持OpenGL3的，如果不支持尝试OpenGL2，但是线性空间下，只能选OpenGLES3，会多出来Require ES3.1和Require ES3.1+AEP。
+如果项目中用到了依赖ES3.1的特性，而且不支持Fallback，那么可以增加这个选项。比如用到了Compute Shader，但这样会减少兼容的设备。
+
+GC方面的优化很重要，原则就是任何大于20B的GC都值得被注意。GC的优化比较琐碎，也比较考验基本功。
+
+除了最简单的避免使用foreach，避免频繁new内存，ToString。下面几个点可能是往往容易被忽略。
+
+
+
+1. GameObject.SetActive会引起GC
+优化方法：对于渲染相关的，可以考虑是否隐藏MeshRenderer来替代，还有就是把GameObject拉到很远的地方，UI也同样适用。
+2. C#自带的排序有GC
+优化方法：自己实现排序算法,数量不多的直接写个简单的冒泡就行。
+3. 反射会引起GC
+优化方法：大部分的反射都可以用dictionary做缓存。
+4. List.Add会有GC
+优化方法：List底层是数组，在数组容量不够的时候就会扩充，会产生GC。可以考虑在new的时候直接指定大小。
+5. Box Unbox 会有gc
+Boxing的GC很隐藏，打桩也很难发现，Boxing的触发条件：当需要将栈（Stack）上的值类型转换为堆（Heap）上的引用类型，这个过程被称为“装箱”，它具有以下特性：
+1. 在堆（Heap）上分配空间
+2. 通知垃圾回收器有关新对象的信息
+3. 复制值类型对象中的数据并传递给新的引用类型对象 https://www.cnblogs.com/wetest/p/9550990.html#top
+
+下面几个点一定要注意!
+Overdraw! Overdraw! Overdraw!注意每一块半透明是否需要渲染，面积是否能够减少。
+Shader的复杂度会影响fillrate。
+游戏场景内最好不要出现alpha test，会影响Hidden Surface Removal（HSR）的处理。
+不要轻易尝试后处理，耗CPU, 耗内存, 耗GPU,中低配一定要关掉。
+粒子系统请慎重使用，耗CPU，多Overdraw，数量和粒子总数都要控制好。
+Static Batch 会消耗内存。
+Dynamic Batch耗CPU，但是当需要渲染很多个同样的MeshRenderer的时候，对于减少DC非常有效，建议开启。
+单局外的性能也要注意！
