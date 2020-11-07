@@ -254,3 +254,41 @@ Shader的复杂度会影响fillrate。
 Static Batch 会消耗内存。
 Dynamic Batch耗CPU，但是当需要渲染很多个同样的MeshRenderer的时候，对于减少DC非常有效，建议开启。
 单局外的性能也要注意！
+
+对动态HUD缓存机制的影响 https://zhuanlan.zhihu.com/p/43111806
+NGUI
+适量元素：Color.a= 0，移出
+大量元素：SetActive(false)
+Time + 二级缓存
+UGUI
+Scale = 0, Alpha Group = 0
+如血条，伤害数字，经常会出现消失的UI元素，如果出现就创建，消失就destory，开销会非常大。所以通常的做法通过缓存，如果通过SetActive有时候会有额外的开销，
+UGUI通常的操作方式可以通过scale = 0 ，或则Alpha Group为0，可以快速隐藏，不要直接alpha = 0 ，在draw call 上是没变化的，实际上还是画了个透明度为0的面片。
+NGUI中和UGUI相反，如果设置alpha = 0 ，是会把顶点移除掉，可以减少setActive的开销。
+
+event trigger Unity3D---UGUI---Button相关、点击、按下、抬起、长按事件 https://www.jianshu.com/p/9f0f90acc84f
+
+https://zhuanlan.zhihu.com/p/43111806
+https://www.cnblogs.com/wetest/p/7018010.html
+
+yield return 0 0被装箱
+yield return null 正确使用
+
+mono事先会分配一定的堆内存，gc会定时调用也可以手动调用，释放被在被使用的内存，当申请内存是，mono中分配的内存不足，会调用gc释放内存，如果内存还是不足则会扩充mono内存，频繁的申请内存会耗光mono内存，同时可能会产生内存碎片，导致无法申请打的内存，导致mono内存耗光，产生gc，扩充mono内存。
+
+
+优化无止境，优化的最高境界是不渲染
+
+关于字体剥离和精简工具 FontSubsetGUI 和 FontPruner 的比较。
+　　在 Unity 中制作游戏时对动态字体的剥离和精简是现在常用的手段，现在有两篇博客是大家阅读和参照较多的，分别是 如何精简Unity中使用的字体文件 和 FontPruner 字体精简工具。他们各自提供了一个用于精简字体的工具， FontSubsetGUI 和 FontPruner。前者是网络上一个作者提供的免费软件，现在不是很好找，后者是西山居开源的内部工具，基于 google 的 sfntly 制作。
+
+　　我分别使用两个工具裁剪同一个字体，使用同一套文本，发现结果还是有区别。字体：仿宋；大小10Mb；裁剪文本：“abcdefg0123我要喝咖啡”；裁剪后查看工具：FontCreator（试用了众多工具后发现是最好用和专业的工具）。 https://www.cnblogs.com/yaukey/p/compare_fontsubsetgui_fontpruner_for_unity.html
+
+模型辅助工具
+　　美术制作出的模型通常是高精度模型，虽然效果好，但往往在中低端机不需要这么高的精度，这时候就要借助一些工具进行优化。
+　　下面主要介绍Unity的工具，其它引擎应该有类似的工具。
+　　MeshBaker：模型合并插件，可以对多个模型合成一个模型，从而减少模型个数，降低Draw Calls。多用于静态物体合并，比如场景和地面静态物体。
+　　SimpleLOD：模型减面库，可以离线或运行时给模型进行减面优化，也可以方便地做成批处理工具
+
+https://www.cnblogs.com/timlly/p/10463467.html **************
+
