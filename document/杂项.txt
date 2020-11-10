@@ -292,3 +292,98 @@ mono事先会分配一定的堆内存，gc会定时调用也可以手动调用�
 
 https://www.cnblogs.com/timlly/p/10463467.html **************
 
+协程。协程是运行于主线程的伪线程，但可以模拟异步操作，没有多线程的副作用。故而也可以用于限帧操作。
+Unity的协程不是真正的线程。
+
+CPU和GPU通过PCI-e总线相连，它们之间的传输能力是有上限的，这个上限就是带宽。如果绘制需要传输的数据大于带宽（即带宽负载过高），就会出现画面卡顿/跳帧/撕裂/延迟/黑屏等等各种异常。
+
+光照模型
+Flat Shading（平面着色） Gouraud Shading（高洛德着色） Lambert Shading（兰伯特着色） Half Lambert Shading（半兰伯特着色） Phong Shading（冯氏着色） Blinn-Phong Shading
+
+uniform变量在vertex和fragment两者之间声明方式完全一样，则它可以在vertex和fragment共享使用。（相当于一个被vertex和fragment shader共享的全局变量）
+attribute变量是只能在vertex shader中使用的变量。（它不能在fragment shader中声明attribute变量，也不能被fragment shader中使用）
+varying变量是vertex和fragment shader之间做数据传递用的。一般vertex shader修改varying变量的值，然后fragment shader使用该varying变量的值。因此varying变量在vertex和fragment shader二者之间的声明必须是一致的。application不能使用此变量。
+https://www.cnblogs.com/softimagewht/p/4750847.html
+
+当Canvas重建时，会引起材质的重新创建、排序、Mesh重建，这都会带来CPU的开销。当Canvas内容非常复杂的时候，每次重建很可能会带来比较明显的卡顿。UGUI里面的Mask会使用StencilBuffer，蒙版内的元素是没法和外面的元素做合批，即便在图集与材质都是相同的。这时可以用RectMask2D来实现蒙版，可以稍微降低一些开销。Canvas上的GraphicRaycaster选项，在不需要有交互时可以不勾选。而Layout组件会涉及到节点的遍历操作，都有内存与CPU的开销，如果能不用就不用它，或者自行硬编码实现简单的自动布局。
+https://mp.weixin.qq.com/s?__biz=MzU5MjQ1NTEwOA==&mid=2247493814&idx=1&sn=39bcb1b3e6ce275e6e85665e628d0c55&chksm=fe1ddc1dc96a550bc846d83dd51cfe8e3c9be3f16495155a60dbbe3c08f232210a981385cea1&mpshare=1&scene=23&srcid=0704yTg4ItGDKJsQXiAMlRVS#rd
+
+gpu 粒子 粒子在gpu进行计算
+
+Unity引擎自带的Terrian系统，可以通过分区块或者转为Mesh解决此部分性能瓶颈。我们可以通过插件Terrain Slicing & Dynamic Loading Kit来分割地形，并调整地形的尺寸和精度等配置参数。
+https://mp.weixin.qq.com/s?__biz=MzU5MjQ1NTEwOA==&mid=2247493814&idx=1&sn=39bcb1b3e6ce275e6e85665e628d0c55&chksm=fe1ddc1dc96a550bc846d83dd51cfe8e3c9be3f16495155a60dbbe3c08f232210a981385cea1&mpshare=1&scene=23&srcid=0704yTg4ItGDKJsQXiAMlRVS#rd
+
+Gfx.WaitForPresent && Graphics.PresentAndSync
+这两个参数在Profiler中经常出现CPU占用较高的情况，且仅在发布版本中可以看到。究其原因，其实是CPU和GPU之间的垂直同步（VSync）导致的，之所以会有两种参数，主要是与项目是否开启多线程渲染有关。当项目开启多线程渲染时，你看到的则是Gfx.WaitForPresent；当项目未开启多线程渲染时，看到的则是Graphics.PresentAndSync。
+https://blog.uwa4d.com/archives/presentandsync.html
+
+Unity的UI渲染顺序的确定有2个步骤，第一步计算每个UI元素的层级号；第二步合并相同层级号中可以Batch的元素作为一个批次，并对批次进行排序；
+先从直观的角度来解释计算层级号的算法：如果有一个UI元素，它所占的屏幕范围内（通常是矩形），如果没有任何UI在它的底下，那么它的层级号就是0（最底下）；如果有一个UI在其底下且该UI可以和它Batch，那它的层级号与底下的UI层级一样；如果有一个UI在其底下但是无法与它Batch，那它的层级号为底下的UI的层级+1；如果有多个UI都在其下面，那么按前两种方式遍历计算所有的层级号，其中最大的那个作为自己的层级号。
+https://www.jianshu.com/p/061e67308e5f
+
+设计UI时要考虑重用性，如一些边框、按钮等，这些作为共享资源，放在1~3张大图集中，称为重用图集；
+其它非重用UI按照功能模块进行划分，每个模块使用1~2张图集，为功能图集；
+对于一些UI，如果同时用到功能图集与重用图集，但是其功能图集剩下的“空位”较多，则可以考虑将用到的重用图集中的元素单独拎出来，合入功能图集中，从而做到让UI只依赖于功能图集。也就是通过一定的冗余，来达到性能的提升。
+有相同材质和纹理的UI元素是可以Batch的，可以Batch的UI上下叠在一块不会影响性能，但是如果不能Batch的UI元素叠在一块，就会增加Drawcall开销。
+要注意UI元素间的层叠关系，建议用“T”工具查看其矩形大小，因为有些图片透明，但是却叠在其它UI上面了，然后又无法Batch的话，就会无故多许多Drawcall；
+UI中出现最多的就是Image与Text组件，当Text叠在Image上面（如Button)，然后Text上又叠了一个图片时，就会至少多2个Drawcall，可以考虑将字体直接印在下面的图片上；
+有些情况可以考虑人为增加层级从而减少Drawcall，比如一个Text的层级为0，另一个可Batch的Text叠在一个图片A上，层级为1，那此时2个Text因为层级不同会安排2个Drawcall，但如果在第一个Text下放一个透明的图片（与图片A可Batch），那两个Text的层级就一致了，Drawcall就可以减少一个。
+应该尽量避免使用Mask，其实Mask的功能有些时候可以变通实现，比如设计一个边框，让这个边框叠在最上面，底下的UI移动时，就会被这个边框遮住；
+如果要使用Mask时，需要评估下Mask会带来的性能损耗，并尽量将其降到最低。比如Mask内的UI是动态生成的话（像List组件），那么需要注意生成的UI之间是否有重叠的现象；
+有空好好看下Unity GUI层级合并规则与批次生成规则这一节。
+
+批处理动态物体需要在每个顶点上进行一定的开销，所以动态批处理仅支持小于900顶点的网格物体。
+
+GC释放的内存只会留给mono使用，并不会交还给操作系统，因此mono堆内存是只增不减的。 https://blog.csdn.net/qq_33337811/article/details/78093479
+
+Dynamic Batching
+Unity可以自动batch移动物体到相同的draw call，如果它们具有相同的材质和满足其它标准。动态Batching是自动完成的，不需要你做额外的事情。
+Batching 动态的物体每个顶点会有某些开销，所以batching只适用于定点数小于900的meshes。
+如果你得shader使用了顶点位置，法线和单独的UV，那么你可以batch 300 个顶点;如果你得shader使用了顶点位置，法线，UV0，UV1，和正切，只能batch 180个顶点。
+这个限制的数量将来有可能会变化。
+如果物体包含镜像变换，他们将不会被batched，例如，object A 的scale 为 +1 object B 的scale 为-1，就不能batched到一起。
+使用不同材质的实例，即使他们实质上是相同的，也会导致两个物体不能被batched到一起。阴影投射除外。
+具有光照贴图的对象有额外的渲染参数：光照索引和 偏移/放缩 的光照。所以一般动态lightmapped对象应指向完全相同的光照贴图位置然后再进行batch。
+多通道的shader将不会被batching
+几乎所有的Unity shader都支持前置渲染几个灯光，有效的为他们做更多的通道。“额外的逐像素的灯光”的draw call 将不会被batched。
+传统的延迟渲（逐通道光照）染通道禁用了动态batching，因为它必须绘制两次。
+由于它的工作原理是变换所有的物体的顶点到CPU的世界坐标中，所以它仅仅在它的工作（变换到cpu的世界坐标）比做一次“draw call”小的时候才能起到好的作用。究竟一个DrawCall有多昂贵取决于诸多因素，主要是所用的绘图API。例如，在控制台或当前流
+行的APIs 例如Apple Metal DrawCall的开销一般比较低，所以一般动态batching不会达到好的效果。
+
+还不能忘了IL2CPP，这是完全独立的一个Runtime，编译成IL2CPP就意味着跟Mono没有关系了，这时它也有自己的一套GC实现，很不幸依然使用了老旧的Boehm-Demers-Wiser GC。
+
+
+A2：1）Mono早期使用的是Boehm-Demers-Wiser GC库，后期更新为有分代和多线程能力的SGen库。
+2）这里需要强调一下，由于历史原因，Unity使用版本比较老的Mono，然后在其基础上做了很多修改，以及整合外围的一些新功能，导致的结果是无法跟进最新版本的Mono，这也是为什么GC还是最老的Boehm-Demers-Wiser库。所以如果想自己尝试整合最新的Mono，很可能会不理想。
+3）然后，还不能忘了IL2CPP，这是完全独立的一个Runtime，编译成IL2CPP就意味着跟Mono没有关系了，这时它也有自己的一套GC实现，很不幸依然使用了老旧的Boehm-Demers-Wiser GC。
+4）Mono在语法、编译、Runtime、库等等层面上确实执行了.NET的标准，但是GC的底层实现上至少早期是没有明确规定怎么实现底层的，就算有，Mono也因为微软不公开代码的原因，当时也不得不自己摸索一套方案，于是也就有了现在跟.NET毫无关联的GC实现。
+
+
+纹理导入设置中的 Read/Write Enabled 处于勾选状态
+开启纹理导入设置中 Read/Write Enabled，纹理在传到GPU之后，CPU端的数据也会一直保留在内存中。因为在移动端显存共享内存，会导致内存占用加倍。因此需要注意是否有需要在CPU端访问的纹理，比如：需要通过脚本获取纹理像素的情况下，就要开启纹理导入设置中的 Read/Write Enabled。
+
+模型文件导入设置中 Read/Write Enabled 处于勾选状态
+除了需要脚本中访问的网格，作为网格碰撞器中的网格，脚本中用StaticBatchingUtility.Combine静态合批的网格，以及粒子系统发射的网格之外，其它模型建议不要勾选此项 ，否则会在内存也保留一份网格实例占用内存。
+
+频繁调用的Camera.main
+建议脚本做好Main Camera的Cache。Camera.main实际为GameObject.FindGameObjectsWithTag(“MainCamera”)调用，主要因为引擎无法得知用户通过脚本设置的MainCamera，CPU消耗较高。
+
+脚本中大量UnityEngine.Object的判等操作
+建议改为用InstanceID来判断即Object. GetInstanceID，运行期间保证唯一。 因为Object的判等还有额外的耗时操作，而Int类型的判等就非常快速了。同理，使用Object作为key的数据结构也建议改用InstanceID做key。
+
+地图切割
+unity 地形切割及动态加载插件Terrain Slicing Dynamic Loading Kit v4.0
+Unity 场景分页插件 World Streamer 支持无限大地图的解决方案（二）
+
+Q：请问Unity3D引擎运行时，如果我们使用的是采用了某个压缩格式的纹理，则纹理是在载入时解压并按照位图的RGBA32位的格式保存在内存，还是在内存中也是压缩格式的数据，并在提交渲染时由GPU自行解压并采样纹素。为何经常看到文章说GPU硬件支持某些图片或者视频流的压缩格式呢？这个处理流程大概是什么样的？
+
+A：其实这是两个概念，图片压缩和纹理压缩（术语可能使用的不准确，请大神指正）。jpg和png这种是图片压缩，ETC、PVRTC、ASTC这种是纹理压缩。图片文件从硬盘读取到内存，解压缩成为纹理，再传给GPU，GPU再进行解压缩变成具体的RGB色彩值。如果没有开Read&Write，纹理会从内存中卸载掉。
+
+尽可能避免布局组
+问题：每个尝试脏化其布局的UI元素将执行至少一次GetComponents调用。
+当布局系统上的一个或多个子元素发生更改时，它会脏化。发生更改的子元素会导致拥有它的布局系统无效。
+关于布局系统的一点补充：布局系统是直接位于Layout Element上的一组连续的布局组。Layout Element不仅仅是Layout Element组件：UI图像、文本和滚动矩形（它们也是Layout Element）。滚动矩形也是布局组。
+回到问题：每个将其布局标记为脏化的UI元素至少会执行一次GetComponents调用。该调用会在Layout Element的父级中查找有效的布局组。如果找到，它会继续向上查找Transform层级，直到停止查找布局组或达到根层级（以先到为准）。因此，每个布局组会将一个GetComponents调用添加到每个子Layout Element的脏化过程，这导致嵌套不具足的性能极其低下。
+解决方案：尽可能避免布局组。
+为比例布局使用锚点。在包含动态数量元素的活跃UI上，请考虑自己编写计算布局的代码，并且确保仅在必要时使用，而不是每次发生一个更改时都使用。
+
