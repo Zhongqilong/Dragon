@@ -111,6 +111,9 @@ Unity很多内置继承自UnityEngine.Object的对象如Texture、Component等�
 if(obj == null && (obj as System.Object != null))
 那么就可以认为C++层已经被销毁，但是C#还在残留，也就是泄露了。原理参考：UnityEngine.Object里的迷之null（http://qiankanglai.me/2016/10/21/fake-null/）。
 
+在C#层，做一个tick逻辑，每帧检查ObjectTranslator中的objects中的一部分对象，如果是Unity.GameObject类型的，查看其是否等于null，如果作为Unity.GameObject对象是null，而作为System.Object对象不是null，说明这个对象已经被Unity标记为销毁了，Unity.GameObject重载的==运算符让游戏逻辑认为它是空的，这时候C#对象可以提前销毁掉，因为即便Lua层想访问它，也已经会报错了。
+http://www.manew.com/forum.php?mod=viewthread&tid=141722
+
 CommandBuffer作用就是在相机渲染的某个阶段，再另外执行自己的额外渲染，至于渲染的结果就看我们怎么用了。
 
 在设备上Shader的加载其实并不慢，通常慢在编译上，也就是Warmup做的事情。因为不同设备GPU以及驱动不一样，因此手游上的Shader是没办法在打包的时候编译的，这就需要到设备上进行编译。（说到这个，我其实也不是很清楚在打包过程中观察到的Shader编译是在干嘛。大约是把Unity自己的Shader格式转换成目标平台的Shader格式，比如：GLSL等，这也的确是一种编译。）ShaderVariantCollection要能够有针对性地提预热（提前编译）Shader，自然是要在打包的时候根据需求收集可能用到的变体，这就和打包有了关系。至于编译，就像前面所说，打包时需要转换，到设备上才真正编译Shader。
@@ -308,7 +311,7 @@ https://www.cnblogs.com/softimagewht/p/4750847.html
 当Canvas重建时，会引起材质的重新创建、排序、Mesh重建，这都会带来CPU的开销。当Canvas内容非常复杂的时候，每次重建很可能会带来比较明显的卡顿。UGUI里面的Mask会使用StencilBuffer，蒙版内的元素是没法和外面的元素做合批，即便在图集与材质都是相同的。这时可以用RectMask2D来实现蒙版，可以稍微降低一些开销。Canvas上的GraphicRaycaster选项，在不需要有交互时可以不勾选。而Layout组件会涉及到节点的遍历操作，都有内存与CPU的开销，如果能不用就不用它，或者自行硬编码实现简单的自动布局。
 https://mp.weixin.qq.com/s?__biz=MzU5MjQ1NTEwOA==&mid=2247493814&idx=1&sn=39bcb1b3e6ce275e6e85665e628d0c55&chksm=fe1ddc1dc96a550bc846d83dd51cfe8e3c9be3f16495155a60dbbe3c08f232210a981385cea1&mpshare=1&scene=23&srcid=0704yTg4ItGDKJsQXiAMlRVS#rd
 
-gpu 粒子 粒子在gpu进行计算
+gpu 粒子 粒子在gpu进行计算 computershader gup instancing
 
 Unity引擎自带的Terrian系统，可以通过分区块或者转为Mesh解决此部分性能瓶颈。我们可以通过插件Terrain Slicing & Dynamic Loading Kit来分割地形，并调整地形的尺寸和精度等配置参数。
 https://mp.weixin.qq.com/s?__biz=MzU5MjQ1NTEwOA==&mid=2247493814&idx=1&sn=39bcb1b3e6ce275e6e85665e628d0c55&chksm=fe1ddc1dc96a550bc846d83dd51cfe8e3c9be3f16495155a60dbbe3c08f232210a981385cea1&mpshare=1&scene=23&srcid=0704yTg4ItGDKJsQXiAMlRVS#rd
@@ -386,4 +389,206 @@ A：其实这是两个概念，图片压缩和纹理压缩（术语可能使用�
 回到问题：每个将其布局标记为脏化的UI元素至少会执行一次GetComponents调用。该调用会在Layout Element的父级中查找有效的布局组。如果找到，它会继续向上查找Transform层级，直到停止查找布局组或达到根层级（以先到为准）。因此，每个布局组会将一个GetComponents调用添加到每个子Layout Element的脏化过程，这导致嵌套不具足的性能极其低下。
 解决方案：尽可能避免布局组。
 为比例布局使用锚点。在包含动态数量元素的活跃UI上，请考虑自己编写计算布局的代码，并且确保仅在必要时使用，而不是每次发生一个更改时都使用。
+
+遮挡剔除是当一个物体被其他物体遮挡住而不在摄像机的可视范围内时，不对其进行渲染。在3D图形计算中并不是一个自动进行的过程，因为在绝大多数情况下离相机最远的物体首先被渲染，靠近摄像机的物体后渲染，并覆盖先前渲染的物体（这种重复渲染又叫做"OverDraw"）， 它不同于视锥剪裁。
+
+视锥剪裁只是不渲染摄像机视角范围外的物体，而对于那些被其他物体遮挡，但是依然在镜头范围内的物体，则不会被视锥剔除。当你使用遮挡剔除时，视锥裁剪还是会生效的。我们在游戏中主流的Occlusion Culling 方案基本上是以下几种方式:
+
+Stream的子类
+1.MemoryStream 存储在内存中的字节流。
+2.FileStream 存储在文件系统的字节流。
+3.NetworkStream 通过网络设备读写的字节流。
+4.BufferedStream 为其他流提供缓冲的流。
+
+
+关于AssetBundle.LoadFromMemroy内存翻倍问题
+LoadFromMemroy输入的byte数组是用的MONO堆内存吧，哪怕这个内存有释放，但Mono堆内存总量只升不降的，加载资源过程中，一旦Mono触发GC后仍内存不够，很可能需要申请新的Mono内存，会导致Mono内存持续升高~
+
+而且用LoadFromMemroy没有必要性吧，用这个接口哪怕内存不是问题，也会在加载资源时明显比LoadFromFile慢不少，而且真想逆向AB资源还是很容易的。退一步说，非要加密的话，也建议使用LoadFromStream然后自己去实现Stream解密
+
+常用技术按年份来排：Unlit→Lambert→Blinn-Phong→各种PBR。
+
+UI重绘时机【SendWillRenderCanvases】
+当UI ModeifyMesh之后，就会触发Canvas的SendWillRendererCanvases，进行UI重绘。[RectTransform修改了SizeDetal、Anchor、pivot都会触发ModifyMesh，其他的SQT变化并不会触发ModifyMesh]
+切换UI的Active之后，会触发ModifyMesh，会触发SendWillRendererCanvases消耗
+切换UI的CanvasGroup或CanvasRenderer的alpha，不会触发ModifyMesh，也就是说设置alpha为0也能够达到SetActive=false的效果，并且alpha设置为0之后，也不会进行DrawCall计算
+切换UI的Parent之后，也会触发ModifyMesh，会触发SendWillRendererCanvases消耗
+https://github.com/XINCGer/Unity3DTraining/blob/master/PerformanceOptimization/TX%E5%B7%A5%E4%BD%9C%E5%AE%A4UI%E4%BC%98%E5%8C%96%E6%96%87%E6%A1%A3.md
+
+首先这是最简单的情况，过程简述如下
+
+首先判断当前UI所占的Rect区域【相对于整个的Root节点而言】是否底下有重叠的情况，如果没有，那么当前就是第0层，将当前层级记录下来
+深度优先迭代Transform下的所有孩子，从最顶层的层级开始判断，查看当前UI Rect所占的区域是否与该层级的任意UI节点重叠，如果是，那么判断当前的UI节点是否能够被该层级的UI节点进行Batch，如果能，那么当前UI节点属于该层级，否则属于后面一个层级。如果没有重叠，那么依次往前面的层级检测，最低层级为0
+得到所有UI节点以及对应的层级后，将每个层级中的UI节点进行batch合并分析，能够进行合并的放在一个batch结构中。
+对所有的batch结构进行排序，首先能够确认的一个排序规则是，Text的batch先被绘制，然后才是进行Image的绘制。如果有Mask的情况，Mask的Text与Mask的Image会比无Mask的后被绘制。同时需要注意的是，即便是Text，但是由于font不同或者Text的材质不同，也是不能进行Batch的，那么此时应该如果判断batch排序呢，这里笔者猜测是根据Hierarchy中的先后顺序得出的，Image的也不例外
+最后将所有的层级从下到上取出所有的Batch集合放在一个统一的集合中，然后迭代该Batch集合，如果相邻的两个Batch之间能够进行再合并，那么就合并为一个Batch。
+最后，得出的Batch集合就是UI的DC数目，也是最后UI的渲染顺序。
+
+尽量避免Unity提供的Outline与Shadow
+Outline与Shadow会产生多4倍的定点数，这是不能够忍受的
+使用自己提供的SingleOutline,只多一倍的定点数，并且更符合美术的预期
+
+WAV 适用于较短的音乐文件可用作游戏打斗音效
+MP3 适用于较长的音乐文件可用作游戏背景音乐
+
+动画文件优化思路
+1.使用Optimal压缩格式
+2.去除动画文件的scale信息
+对于一般的人形动画需求，不会有模型骨骼scale变化的情况。
+因此我们可以把动画信息的scale部分去除，可以节约一部分大小。
+3.缩减transform的float精度信息
+默认存储每一帧transform信息的是10位精度的float格式数据。
+建议通过导入器的OnPostprocessModel函数，缩减此数据为3位精度float，视觉效果基本一样。优化效果非常显著。
+
+
+Unity提供了三种批次合并的方法，分别是Static Batching，GPU Instancing和Dynamic Batching。它们的原理分别如下：
+Static Batching，将静态物体集合成一个大号vbo提交，但是只对要渲染的物体提交其IBO。这么做不是没有代价。比如说，四个物体要静态批次合并前三个物体每个顶点只需要位置，第一套uv坐标信息，法线信息，而第四个物体除了以上信息，还多出来切线信息，则这个VBO会在每个顶点都包括所有的四套信息，毫无疑问组合这个VBO是要对CPU和显存有额外开销的。要求每一次Static Batching使用同样的material，但是对mesh不要求相同。
+
+Dynamic Batching将物体动态组装成一个个稍大的vbo+ibo提交。这个过程不要求使用同样的mesh，但是也一样要求同样的材质。但是，由于每一帧CPU都要将每个物体的顶点从模型坐标空间变换到组装后的模型的坐标空间，这样做会带来一定的计算压力。所以对于Unity引擎，一个批次的动态物体顶点数是有限制的。
+
+GPU Instancing是只提交一个物体的mesh，但是将多个使用同种mesh和material的物体的差异化信息（包括位置，缩放，旋转，shader上面的参数等。shader参数不包括纹理）组合成一个PIA提交。在GPU侧，通过读取每个物体的PIA数据，对同一个mesh进行各种变换后绘制。这种方式相比static和dynamic节约显存，又相比dynamic节约CPU开销。但是相比这两种批次合并方案，会略微给GPU带来一定的计算压力。但这种压力通常可以忽略不计。限制是必须相同材质相同物体，但是不同物体的材质上的参数可以不同。
+https://zhuanlan.zhihu.com/p/76562300
+
+Draw call严格意义上，CPU每次调用图形API的渲染函数（使用OpenGL举例，是glDrawElements或者DrawIndexedPrimitive）都算作一次Draw Call，但是对于Unity而言，它可以多个Draw Call合并成一个Batch去渲染。
+
+Resource 文件夹（Do not use it. 除非在 debug 的时候）
+- Resource 和 AssetBundle 一样，也有头来索引。Resource  在打进包的时候会做一个红黑树，来帮助 Resource 来检索资源在什么位置，
+- 如果 Resource 非常大，那么红黑树也会非常大。
+- 红黑树是不可卸载的。在刚开始游戏的时候就会加载进内存中，会持续对游戏造成内存压力。
+- 会极大拖慢游戏的启动时间。因为红黑树没加载完，游戏不能启动。 https://www.notion.so/Unity-f79bb1d4ccfc483fbd8f8eb859ae55fe
+
+VM 内存池
+- mono 虚拟机的内存池
+- VM 会返还内存给 OS 吗？
+    - **会**
+- 返还条件是什么？
+    - GC 不会把内存返还给系统
+    - 内存也是以 Block 来管理的。当一个 Block 连续六次 GC 没有被访问到，这块内存才会被返还到系统。（mono runtime 基本看不到，IL2cpp runtime 可能会看到多一点）
+- 不会频繁地分配内存，而是一次分配一大块。
+
+- Closures and anonymous methods（闭包和匿名函数）
+    - 如果看 IL，所有匿名函数和闭包会 new 成一个 class，因此所有变量和要 new 的东西都是要占内存的。这样会导致协程。
+        - 有些开发者会在游戏开始启用一个协程，直到游戏结束才释放，这是错误的。
+        - 只要协程不被释放掉，所有内存都会在内存里。
+https://www.notion.so/Unity-f79bb1d4ccfc483fbd8f8eb859ae55fe
+
+odin序列化插件
+shadercontrol shader变体控制
+
+
+　(1)正常情况下游戏如果一直玩下去，Mono是不是会一直增加？ 比如频繁打开一个界面，界面里有脚本会不断创建一些东西 ，那么Mono是否会不断增加？对性能上会不会造成影响呢？
+
+　　在除开启IL2CPP功能的应用中，Mono 确实是不会下降，但并不应该一直上升。 创建出来的东西，如果被引用在一个容器里，或者被某些脚本的变量引用，那么这部分堆内存就释放不掉；但如果没有被任何容器或者变量引用（比如，临时拼一个 String），那么这部分堆内存会在 GC 的时候释放（释放是指变为空闲的堆内存，堆内存的总量是不会下降的）。 对于后者，频繁地 new 对象虽然不会一直增加堆内存，但是会加速 GC 调用的频率，所以同样是需要尽量避免的。
+
+　　(2)如果脚本引用了GameObject，那转换场景的时候脚本和GameObject都没了，还会产生堆内存的吗？
+
+　　如果脚本是MonoBehaviour，而且在切换场景后所挂的Game Object被释放了，那么这个脚本对象所引用的堆内存就会在GC的时候被释放。 但有一种例外，如果是通过Static变量引用的堆内存，那么依然是释放不掉的，除非手动解开引用，比如变量置Null，数组Clear等等。
+
+　　(3)另外Unity还有一个老生常谈的IsNull问题
+
+　　在名为A的MonoBehaviour中，有个数组来存放名为B的 MonoBehaviour对象的引用。当我们其他的逻辑去Destroy了B对象所在的GameObject后，在A对象中的数组里，遍历打印，它们（B的引用）都为Null，在Inspector面板上看是missing。而这时候进行GC，堆内存其实并未释放这些B对象。只有当A对象中的数组被清空后，再调用GC，才可释放这些对象所占内存。这种现象是否正常？为什么值为Null但却还是被引用着，无法通过GC释放呢？
+
+　　首先这种现象是正常的。这是Unity中对Null的检测做了特殊的处理所致，在Unity中MonoBehaviour对象除了存在于Managed Heap中（作为“壳”），在Native内存中还会有一个相对应的“实体”，在调用Destroy时，真正被释放的正是这个“实体”。而在判断一个MonoBehaviour对象是否为Null时，Unity会首先检测“实体”是否已经被销毁，如果是则返回为true，但此时Managed Heap中的“壳”实际上依然是被引用的，从而就会出现对象的Null判断为true，但实际上还是被引用着，无法被GC释放的问题。 相关的细节可见官方blog对Unity中Null判断的解释：http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
+
+　　如果是Unity.GameObject类型的，查看其是否等于null，如果作为Unity.GameObject对象是null，而作为System.Object对象不是null，说明这个对象已经被Unity标记为销毁了，Unity.GameObject重载的==运算符让游戏逻辑认为它是空的。
+
+
+虽然透明度在所有平台上都会耗费大量的算力进行渲染，但移动设备因为存在“过度绘制”，所以情况会更严重。当 GPU 不得不反复渲染一个像素时，就会发生过度绘制。每一个与透明对象所重叠的像素都不得不进行渲染，这会严重拖慢游戏的性能。但是，如果你确实需要在游戏中用到透明度，就必须了解能用得上的各种选择。
+对于移动设备，不妨使用 Alpha 混合，因为移动设备的 GPU 具备优化功能，有助于渲染 Alpha 混合的对象。Alpha 混合可以为你提供一系列透明度选项，而不仅仅是像硬生生的画面裁剪那样要么显现要么不显现。
+这个透明选项可以让对象看起来完全不透明或是透明，但无法实现中间效果。这常被称为“裁剪”。我们强烈建议在移动设备中要避免使用裁剪，因为这会使 GPU 的若干优化功能无法启用。
+https://mp.weixin.qq.com/s/KSkBCtKvxpt5GCnoYH8Ucg
+
+
+防止代码别剔除
+不要忽视Managed code stripping的副作用
+在构建的场景中引用所需的脚本，以防止在构建项目时剔除需要的代码。
+在脚本中引用所需的类，以防止在构建项目时剔除需要的代码。
+添加一个link.xml文件，以防止UnityLinker剔除所需的代码。
+
+
+shaderlab 60m
+
+
+Unity中Lua造成的堆内存泄露问题
+情况一：Lua对象是全局变量，直接放在_G中。禁止定义全局变量，给现有的全局变量前加载local声明。可以使用一些Lua静态语法检查的手段，如Luacheck（https://github.com/mpeterv/luacheck）来检查。
+
+情况二：Lua对象被一些全局的Table引用。
+
+我们每个UI面板都对应MVC结构，用了面向对象的概念。其中view在面板关闭时会直接置空，但Ctrl和Model都不会，它们都放在一个全局的管理类（Table）。当Model中持有了面板上的对象时，会出现对象销毁了，但Model中的变量不为空的情况。
+
+情况三：Lua对象的function字段被赋值给了C#的事件/委托。
+比如UI控件的按钮点击事件。在LuaGC时，发现C#对象对其有引用，GC不掉。导致Lua中的对象通过Tolua引用住了C#对象，而C#对象又通过ToLua引用Lua对象。
+https://mp.weixin.qq.com/s/weuQjDcGPUyxZzQZEsNDxg
+
+Unity内部使用一个名为FMOD的系统来播放音频剪辑（AudioClips），FMOD运行在自有线程上，那些线程负责解码和混合音频。
+但音频播放不是完全不消耗性能的，一些工作会在主线程上为场景中每个活动音频源（Audio Source）而执行。而在如较老的移动手机这样内核数量较少的平台上，FMOD的音频线程可能会和Unity的主线程及渲染线程竞争处理器内核。
+
+实际上，在执行包括距离检查在内的所有和音量相关的计算后，Mute设置仅会把Volume参数限制为0。Unity也会把静音的音频源提交给FMOD，而FMOD会无视这些音频源。音频源参数的计算和音频源提交给FMOD的过程都会在Unity性能分析器中作为AudiosSystem.Update显示。
+
+如果你注意到有大量时间分配给该Profiler标记，请检查是否有大量静音的活动音频源。如果是，请考虑禁用静音的Audio Source组件，而不是把它们设为静音，或者禁用它们的游戏对象。你也可以调用AudioSource.Stop，它会停止音频播放。
+
+out 关键字会导致参数通过引用来传递。这与 ref 关键字类似，不同之处在于 ref 要求变量必须在传递之前进行初始化。若要使用 out 参数，方法定义和调用方法都必须显式使用 out 关键字。例如：
+
+单元测试 Editor Tests Runner https://www.cnblogs.com/msxh/p/7354229.html
+抛出异常，检测异常是否是预测的结果
+单元测试定义：单元测试在传统软件开发中是非常重要的工具，它是指对软件中的最小可测试单元进行检查和验证，一般情况下就是对代码中的一个函数去进行验证，检查它的正确性。一个单元测试是一段自动化的代码，这段代码调用被测试的工作单元，之后对这个单元的单个最终结果的某些假设进行检验。单元测试使用单元测试框架编写，并要求单元测试可靠、可读并且可维护。只要产品代码不发生变化，单元测试的结果是稳定的。
+
+new struct 不会使用托管堆分配内存，会初始化struct，栈上分配内存,结构类型使用new不会分配托管堆分配内存而是调用构造函数初始化字段
+声明结构的默认（无参数）构造函数是错误的。总是提供默认构造函数以将结构成员初始化为它们的默认值。在结构中初始化实例字段也是错误的。 如果使用 new 运算符创建结构对象，则会创建该结构对象，并调用适当的构造函数。与类不同，结构的实例化可以不使用 new 运算符。如果不使用 new，则在初始化所有字段之前，字段都保持未赋值状态且对象不可用。 结构类型使用new不会分配托管堆分配内存而是调用构造函数初始化字段。结构的构造函数要么是有参数的，不可能是无参数，应为无参数是系统自己隐式添加的，就算有另外的构造函数，如果你显示的声明一个无参数的构造函数在结构里，将导致编译错误。 结构体如果不用new初始化，也可以，但是在其使用前必须手动初始化他的每一个成员，否则编译器将报错。用new初始化，可自动将其中的每一个成员都置为零值
+
+**深拷贝：**指的是拷贝一个对象时，不仅仅把对象的引用进行复制，还把该对象引用的值也一起拷贝。这样进行深拷贝后的拷贝对象就和源对象互相独立，其中任何一个对象的改动都不会对另外一个对象造成影响。举个例子，一个人叫张三，然后使用克隆技术以张三来克隆另外一个人叫李四，这样张三和李四就是相互独立的，不管张三缺胳膊还是李四少腿了都不会影响另外一个人。在.NET领域，值对象就是典型的例子，如int, Double以及结构体和枚举等。具体例子如下所示：
+浅拷贝：指的是拷贝一个对象时，仅仅拷贝对象的引用进行拷贝，但是拷贝对象和源对象还是引用同一份实体。此时，其中一个对象的改变都会影响到另一个对象。例如，一个人一开始叫张三，后来改名字为张老三了，可是他们还是同一个人，不管张三缺胳膊还是张老三少腿，都反应在同一个人身上。在.NET中引用类型就是一个例子。
+如何实现一个深拷贝呢？当时只回答回答了一种方式，就是使用反射，然后面试官提示还可以通过反序列化和表达树的方式。然后又继续问，如果用反射来实现深拷贝的话，如何解决互相引用对象的问题呢？（递归拷贝对象数据，判断条件是否已经拷贝，中断递归） 当时我给出的答案是说那就不用反射去实现呗，用反序列化实现呗，或者直接避免使两个对象互相引用呗。然后面试官说，如果一定用反射来写，你是怎么去解决这个问题呢？这时候我就愣住了。
+
+反序列化深拷贝
+
+　使用反射（Reflection）使得程序在运行过程中可以动态的获取对象或类型的类型信息，然后调用该类型的方法和构造函数，或访问和修改该类型的字段和属性；可以通过晚期绑定技术动态的创建类型的实例；可以获取程序集中的所有类型信息；可以在动态构建新类型；还可以检索元素所添加的特性；
+https://www.cnblogs.com/minotauros/p/9709491.html
+
+委托 反射 lambert linq async await
+
+1.release是上线时用的，可以理解为没有那些类似“NSLog那些调试时写的打印信息”。
+2.develop是开发时用的，debug的版本带调试信息。
+3.adHoc打测试版本用的，允许用户从第三方下载该应用。
+
+ios xcode 证书发布
+App Store Connect -上架App Store以及TestFlight的app，用于生产环境发布
+Ad Hoc - 部分机器可安装的app，用于非生产环境的测试 用于第三方安装测试 需要adhoc正式发布
+Enterprise - 企业级应用发布
+Development - 与Ad Hoc类似，只有后续步骤所需要的证书和描述文件不同
+https://insights.thoughtworks.cn/ios-package-release/
+
+但大家可能会发现，企业级应用也没有任何安装数量上的限制，甚至不需要审核。那是否可以把企业级应用public的发布呢？
+答案是否定的。
+首先，企业级应用需要Apple企业账号，Apple对于企业级账号的发放是非常严格的。
+其次，Apple规定企业级应用的下载途径不可公开，若发现公开则会有封号，应用失效的后果。
+因此，虽然从能力上看企业级应用能被安装在任意一台机器上，但是从途径上Apple限制了可能性。
+https://insights.thoughtworks.cn/ios-package-release/
+
+ios包中包含有证书私钥和描述文件生成的签名文件，安装后，系统通过签名文件生成公钥，对比是有ios提供的正确公钥.
+
+Unity中影响渲染顺序的因素总结 https://zhuanlan.zhihu.com/p/55762351
+
+c# 字符串连接使用 +  string.format stringbuilder 效率比较 https://www.cnblogs.com/dawenyang/p/6245471.html
++操作符：最终调用string.concat，运行时分配内存,只分配一次内存(一次性分配内存)
+string.format最终调用stringbuilder
+stringbuilder初始化是分配内存，多次扩充内存将降低效率,可以多次分配内存.(在原有基础扩充内存，不需要重新全部分配)
+
+浅谈 .NET 中的对象引用、非托管指针(& *)和托管指针(out ref) https://www.cnblogs.com/blurhkh/p/10357576.html
+
+手势触摸识别插件  easytouch fingergester
+
+
+对象引用#
+对于对象引用，大家都不会陌生。
+与值类型变量直接包含值不同，引用类型变量存储的是数据的存储位置（托管堆内存地址）。
+对象引用是在托管堆上分配的对象的开始位置指针。访问数据时，运行时要先从变量中读取内存位置（隐式间接寻址），再跳转到包含数据的内存位置，这一切都是隐藏在CLR(公共语言运行库common language runtime)背后发生的事情，我们在使用引用类型的时候，并不需要关心其背后的实现。
+
+模型顶点色（color）怎么去除 https://answer.uwa4d.com/question/5a8f77970b827e2c0bfdcfaf
+
+lua内存泄漏
+.在C#层，做一个tick逻辑，每帧检查ObjectTranslator中的objects中的一部分对象，如果是Unity.GameObject类型的，查看其是否等于null，如果作为Unity.GameObject对象是null，而作为System.Object对象不是null，说明这个对象已经被Unity标记为销毁了，Unity.GameObject重载的==运算符让游戏逻辑认为它是空的，这时候C#对象可以提前销毁掉，因为即便Lua层想访问它，也已经会报错了。
+http://www.manew.com/thread-141722-1-1.html
+
+
 
