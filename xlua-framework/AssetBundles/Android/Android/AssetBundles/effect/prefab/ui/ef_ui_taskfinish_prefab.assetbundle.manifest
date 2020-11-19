@@ -1,0 +1,44 @@
+ManifestFileVersion: 0
+CRC: 689016942
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 9093630ba251ceebb30bbbe1db1d1528
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 02eec4fd69c58b98826b491436c84f27
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Effect/Prefab/UI/ef_ui_TaskFinish.prefab
+Dependencies:
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/shaders.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/ani.assetbundle

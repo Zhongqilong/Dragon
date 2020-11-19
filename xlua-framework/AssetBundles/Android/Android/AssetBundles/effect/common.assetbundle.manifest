@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 1529840207
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 6f393f44a7d5ce43b08eaa50bc4e3fb7
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fe397485c3cec1106b49e9ff95e8f8a2
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Effect/Common/Texture/models_fx_a.png
+- Assets/AssetsPackage/Effect/Common/Texture/Matcap_Encode2.png
+- Assets/AssetsPackage/Effect/Common/Materials/models_fx_RGB.mat
+- Assets/AssetsPackage/Effect/Common/Materials/models_fx_R.mat
+- Assets/AssetsPackage/Effect/Common/Texture/models_fx.png
+Dependencies:
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/shaders.assetbundle

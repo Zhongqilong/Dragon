@@ -1,8 +1,7 @@
 fileFormatVersion: 2
 guid: 9c65dd127bb8b454e8673fc5e93c2e74
-timeCreated: 1444909075
-licenseType: Free
 TrueTypeFontImporter:
+  externalObjects: {}
   serializedVersion: 4
   fontSize: 40
   forceTextureCase: -2
@@ -17,6 +16,7 @@ TrueTypeFontImporter:
   fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
   userData: 
   assetBundleName: ui/fonts/system_art_ttf.assetbundle
   assetBundleVariant: 

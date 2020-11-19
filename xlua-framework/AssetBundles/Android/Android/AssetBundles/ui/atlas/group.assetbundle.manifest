@@ -1,0 +1,34 @@
+ManifestFileVersion: 0
+CRC: 2350086509
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b9a185de02e1da8cdc4ebfcf6439e184
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: ea5a42e0fd8ea905efa7aa926a3b8944
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_06.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_10.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_14.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_07.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_09.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_11.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_05.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_04.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_16.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_17.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_13.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_15.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_01.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_03.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_02.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_12.png
+- Assets/AssetsPackage/UI/Atlas/Group/ui_group_08.png
+Dependencies: []

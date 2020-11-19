@@ -3,23 +3,12 @@
 一：命名规范：
 	1、类命名：驼峰式命名：单词首字母大写，如：GetInstance
 	2、函数命名：同类名
-	3、公有变量命名：同类名
-	4、私有变量命名：小写，单词之间用“_”分隔，如：self.action_list
-	5、局部变量命名：同私有变量
-	6、参数名命名：同私有变量
+	3、公有变量命名：小驼峰命名方式
+	4、私有变量命名：_+小驼峰命名方式
+	5、局部变量命名：aa_bb
+	6、参数名命名：aa_bb
 	7、任何情况下不应该由外部访问的成员，使用双下划线打头，其它同私有变量命名，如：析构函数__init，内部成员self.__callback
-	8、由于脚本语言没有跳转功能，最好在UI组件实例的名字末尾标识组件类型，提高可读性：
-		a）基础组件（UIBaseComponent）：xxx_cmp
-		b）按钮（UIButton）：xxx_btn
-		c）文本（UIText）：xxx_txet
-		d）图片（UIImage）：xxx_img
-		e）输入框（UIInput）：xxx_input
-		f）标签组（UITabGroup）：xxx_tabgroup
-		g）按钮组（UIButtonGroup）：xxx_btngroup
-		h）可选中按钮（UIToggelButton）：xxx_togglebtn
-		i）可复用组件（UIWrapGroup）：xxx_wrapgroup
-		j）滑动条组件（UISlider）：xxx_slider
-		k）后续...
+	8、由于脚本语言没有跳转功能，最好在UI组件实例的名字末开头识组件类型，提高可读性
 	9、所有UI脚本以UI打头，即UIxxxx
 	10、系统功能扩展函数：全部使用小写，不用下划线，如对table的扩展：table.walksort
 	11、所有协程函数体以"Co"打头，如：CoAsyncLoad，表示该函数必须运行在协程中，并且可以使用任意协程相关函数

@@ -2,6 +2,8 @@
 using System;
 using UnityEngine;
 using XLua;
+using System.Reflection;
+using System.Linq;
 
 public static class GenConfig
 {
@@ -138,5 +140,38 @@ public static class GenConfig
 		new List<string>(){"System.IO.DirectoryInfo", "Create", "System.Security.AccessControl.DirectorySecurity"},
 		new List<string>(){"UnityEngine.MonoBehaviour", "runInEditMode"},
 		new List<string>(){"UnityEngine.UI.Text", "OnRebuildRequested"},
+        new List<string>(){"System.Type", "IsSZArray"},
 	};
+    
+#if UNITY_2018_1_OR_NEWER
+    //支持通过代码来过滤不需生成代码的方法，主要用于解决2018以后unity运行和编译用的mono不一致的问题。
+    [BlackList]
+    public static Func<MemberInfo, bool> MethodFilter = (memberInfo) =>
+    {
+        if (memberInfo.DeclaringType.IsGenericType && memberInfo.DeclaringType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            if (memberInfo.MemberType == MemberTypes.Constructor)
+            {
+                ConstructorInfo constructorInfo = memberInfo as ConstructorInfo;
+                var parameterInfos = constructorInfo.GetParameters();
+                if (parameterInfos.Length > 0)
+                {
+                    if (typeof(System.Collections.IEnumerable).IsAssignableFrom(parameterInfos[0].ParameterType))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else if (memberInfo.MemberType == MemberTypes.Method)
+            {
+                var methodInfo = memberInfo as MethodInfo;
+                if (methodInfo.Name == "TryAdd" || methodInfo.Name == "Remove" && methodInfo.GetParameters().Length == 2)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+#endif    
 }

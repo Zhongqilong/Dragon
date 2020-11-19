@@ -1,0 +1,38 @@
+ManifestFileVersion: 0
+CRC: 1004285814
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 185eeafca1ef2f31484128e6f9c07510
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2077a372a62d94a1ad27bd1f2c6da03f
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 111
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+- Class: 143
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Models/1001/Character.prefab
+Dependencies: []

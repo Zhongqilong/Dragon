@@ -1,0 +1,41 @@
+ManifestFileVersion: 0
+CRC: 419263972
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4dc3801dde697cd40a31f137e606726d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 82fb879b5c949592c7ff0cfceb5dfff9
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -900027084, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -98529514, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -113659843, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/UI/Prefabs/View/UILaunch.prefab
+Dependencies:
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/atlas/comm.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/atlas/role.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/fonts/system_ttf.assetbundle

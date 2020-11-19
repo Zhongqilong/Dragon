@@ -1,0 +1,29 @@
+ManifestFileVersion: 0
+CRC: 2991559124
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: dd58358bafe9f9a84ebea83d6f54a917
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8e7a9a5bc260fb3cb7f278e39396d550
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Effect/Prefab/UI/ef_ui_pet_rank_yellow_test.prefab
+Dependencies:
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/shaders.assetbundle

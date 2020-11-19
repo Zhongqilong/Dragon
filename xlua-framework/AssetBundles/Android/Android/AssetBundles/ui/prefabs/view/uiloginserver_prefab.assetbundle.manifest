@@ -1,0 +1,60 @@
+ManifestFileVersion: 0
+CRC: 1210430728
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 982252faf90eb0674eaa19e6ae026834
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1702e0116940a7bda2bc301c7292ad59
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -2095666955, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -1200242548, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -900027084, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: -2061169968, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: 1367256648, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: 1573420865, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 114
+  Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/UI/Prefabs/View/UILoginServer.prefab
+Dependencies:
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/ani.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/atlas/comm.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/atlas/group.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/atlas/login.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/fonts/system_ttf.assetbundle
+- /Volumes/DISK/code/github/dragon-xlua-framework/xlua-framework/AssetBundles/Android/Android/AssetBundles/ui/fonts/system_art_ttf.assetbundle
