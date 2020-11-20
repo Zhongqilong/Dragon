@@ -766,8 +766,14 @@ LUALIB_API int luaopen_pb (lua_State *L)
     luaL_newmetatable(L, IOSTRING_META);
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
-    luaL_register(L, NULL, _c_iostring_m);
 
+#if LUA_VERSION_NUM >= 502 //lua 5.2 or above
+    luaL_newlib(L, _c_iostring_m);
+    luaL_newlib(L, _pb);
+#else
+    luaL_register(L, NULL, _c_iostring_m);
     luaL_register(L, "pb", _pb);
+#endif
+
     return 1;
 } 
