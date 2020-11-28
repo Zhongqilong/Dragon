@@ -2038,15 +2038,9 @@ public class Reporter : MonoBehaviour {
             url = System.IO.Path.Combine(streamingAssetsPath, prefFile);
         }
 
-#if !UNITY_2017_1_OR_NEWER
-        if (Application.platform != RuntimePlatform.OSXWebPlayer && Application.platform != RuntimePlatform.WindowsWebPlayer)
-            if (!url.Contains("://"))
-                url = "file://" + url;
-#endif
-
-        url = url.Replace("\\","/");
-       // float startTime = Time.realtimeSinceStartup;
-		WWW www = new WWW( url );
+		url = "file://" + url;
+		// float startTime = Time.realtimeSinceStartup;
+		WWW www = new WWW(url);
 		yield return www ;
 		
 		if( !string.IsNullOrEmpty( www.error ) )
@@ -2057,7 +2051,7 @@ public class Reporter : MonoBehaviour {
 		{
 			buildDate = www.text ;
 		}
-		
+
 		yield break;
 	}
 }

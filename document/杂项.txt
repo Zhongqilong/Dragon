@@ -590,5 +590,6 @@ lua内存泄漏
 .在C#层，做一个tick逻辑，每帧检查ObjectTranslator中的objects中的一部分对象，如果是Unity.GameObject类型的，查看其是否等于null，如果作为Unity.GameObject对象是null，而作为System.Object对象不是null，说明这个对象已经被Unity标记为销毁了，Unity.GameObject重载的==运算符让游戏逻辑认为它是空的，这时候C#对象可以提前销毁掉，因为即便Lua层想访问它，也已经会报错了。
 http://www.manew.com/thread-141722-1-1.html
 
+MemoryProfiler 内存分析工具
 
 
