@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEngine;
 using XLua;
+using System.Diagnostics;
 
 /// <summary>
 /// 说明：xLua管理类
@@ -25,6 +26,7 @@ public class XLuaManager : MonoSingleton<XLuaManager>
     const string hotfixMainScriptName = "XLua.HotfixMain";
     LuaEnv luaEnv = null;
     LuaUpdater luaUpdater = null;
+    public Stopwatch _watch = new Stopwatch();
 
     protected override void Init()
     {
@@ -51,6 +53,9 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         HasGameStart = false;
         if (luaEnv != null)
         {
+            // #if ENABLE_LOG
+            //     _luaenv.Global.Set("ENABLE_LOG", true);
+            // #endif
             luaEnv.AddLoader(CustomLoader);
             luaEnv.AddBuildin("pb", XLua.LuaDLL.Lua.LoadPb);
         }
@@ -233,5 +238,38 @@ public class XLuaManager : MonoSingleton<XLuaManager>
                 Logger.LogError(msg, null);
             }
         }
+    }
+
+    public LuaTable GetScriptEnv(MonoBehaviour view, string luaScript, out string monoName)
+    {
+        if (string.IsNullOrEmpty(luaScript))
+        {
+            monoName = string.Empty;
+            return null;
+        }
+        var _scriptEnv = luaEnv.NewTable();
+        LuaTable meta = luaEnv.NewTable();
+        meta.Set("__index", luaEnv.Global);
+        _scriptEnv.SetMetaTable(meta);
+        meta.Dispose();
+
+        _scriptEnv.Set("mono", view);
+        _scriptEnv.Set("gameObject", view.gameObject);
+        _scriptEnv.Set("transform", view.transform);
+
+        monoName = Path.GetFileNameWithoutExtension(luaScript);
+        
+        _watch.Restart();
+        var luaAsset = CustomLoader(ref luaScript);
+        _watch.Stop();
+        Logger.Log(string.Format("[lua]{0} LoadLuaSync:{1}ms", monoName, _watch.ElapsedMS()));
+
+        if (luaAsset == null)
+        {
+            Logger.LogError(string.Format("lua not found:{0}", luaScript));
+            return null;
+        }
+        luaEnv.DoString(luaAsset, monoName, _scriptEnv); //返回luatable
+        return _scriptEnv;
     }
 }

@@ -592,4 +592,38 @@ http://www.manew.com/thread-141722-1-1.html
 
 MemoryProfiler 内存分析工具
 
+神奇的深度图：复杂的效果，不复杂的原理 https://www.cnblogs.com/murongxiaopifu/p/7050233.html
+有点科幻的扫描网
+透过墙壁绘制背后的“人影”
+护盾/能量场效果
+边缘检测
+
+Unity3D 实用技巧 - Unity Shader 汇总式学习·初探篇 https://mp.weixin.qq.com/s?__biz=MzU5MjQ1NTEwOA==&mid=2247521014&idx=1&sn=fc2f91d8eaedcd98f6f43748e39865bc&chksm=fe1da65dc96a2f4b16c302c21b0705b918e185aaaadfcde369b49610ad9247db64adf0ad9466&xtrack=1&scene=90&subscene=93&sessionid=1606629604&clicktime=1606629851&enterid=1606629851&ascene=56&devicetype=android-29&version=270014e5&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&exportkey=AfLu2E0d%2F%2BQI0mZIOIXesnA%3D&pass_ticket=oeKONKdvpp7Y6OjvpbH6OrttdMTr73bmL9P7bHkoEvGYdY%2Fq99PfQSEBma4T%2ByfU&wx_header=1
+透明度混合：可以得到真正的半透明效果，它会使当前片元的透明度作为混合因子，与已经储存在颜色缓冲中的颜色值进行混合么，得到新的颜色。但是，透明度混合需要关闭深度写入，这使得我们要非常小心物体的渲染顺序。注意：透明度混合只关闭了深度写入，但没有关闭深度测试。这表示当使用透明度混合渲染一个片元时，还是会比较它的深度值与当前深度缓冲中的深度值，如果深度值距离摄像机更远，那么就不会在进行混合操作。比如一个不透明物体在透明物体前面，我们先渲染不透明物体，可以正常的挡住不透明物体。
+
+常见混合操作类型应用：
+A   //正常（Normal）透明度混合 Blend SrcAlpha OneMinusSrcAlpha
+B   //柔和相加 Blend OneMinusDstColor One
+C   //正片叠底 Blend DstColor Zero
+D   //两倍相乘 Blend DstColor SrcColor
+E   //变暗 BlendOp min Blend One One
+F   //变亮 Blend OneMinusDstColor One Blend One OneMinusSrcColor
+G   //线性减淡 Blend One One
+
+https://www.cnblogs.com/LiTZen/p/11597913.html
+对比：SpriteRenderer vs CanvasRenderer
+在Hierarchy窗口,你可以把sprites随便放在哪。然而，UI Images不得不放在canvas下面。你可以通过transform移动其他obejcts那样移动sprites,但是images使用RectTransform来在界面系统中移动。
+使用默认材质时，Sprites是在”Queue” = “Transparent” “RenderType” = “Geometry”(原文： transparent geometry queue)模式下渲染的。UI Images也是在这种模式下渲染的，除非你使用了Overlay 模式渲染（coffeecato补充：Canvas的Render Mode）,这种情况下它将会通过Canvas.RenderOverlay渲染。你可能会猜到，这样在移动设备上的开销很大。我们稍后会讨论到。
+sprites和images的一个最重要的区别在于sprites支持网格的自动构造，而UI Image的网格始终由矩形构成。构造网格的原因将会在下一节讲到；我们将会看到它的重要性及它对性能的重大影响。
+
+SpriteRenderer 与 MeshRenderer
+SpriteRenderer MeshRenderer都继承自render，SpriteRenderer不支持光照、阴影，所以SpriteRenderer的渲染效率会更高。
+SpriteRenderer可以使用sprite editor播放sprite动画
+mesh需使用顶点动画播放
+SpriteRenderer不支持动态 静态合批 gpuinstancing
+
+Unity3D性能优化：ShaderLab内存占用 https://zhuanlan.zhihu.com/p/27336202
+模型导入的时候，“Import Materials”是默认勾选的。所以当模型导入时，Unity会在同目录创建“Materials”目录，并创建相应的材质，而这个材质默认是使用Standard。
+由于美术在制作过程中对Prefab中对模型另外赋予材质，所以实际上，默认创建的材质（Standard）是没有使用到的。可是当加载模型的时候，却又把默认创建的材质加载上了，并对着色器解析了。因此导致内存中有Standard。
+那么解决方法也很简单，把“Import Materials”去掉，并把没有使用的默认材质删除
 

@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(XLuaManager);
-			Utils.BeginObjectRegister(type, L, translator, 0, 9, 2, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 10, 3, 1);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLuaEnv", _m_GetLuaEnv);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "OnInit", _m_OnInit);
@@ -32,12 +32,15 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "StartGame", _m_StartGame);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "ReloadScript", _m_ReloadScript);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Dispose", _m_Dispose);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetScriptEnv", _m_GetScriptEnv);
 			
 			
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "HasGameStart", _g_get_HasGameStart);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "AssetbundleName", _g_get_AssetbundleName);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "_watch", _g_get__watch);
             
-			
+			Utils.RegisterFunc(L, Utils.SETTER_IDX, "_watch", _s_set__watch);
+            
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
@@ -372,6 +375,39 @@ namespace XLua.CSObjectWrap
             
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_GetScriptEnv(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                XLuaManager gen_to_be_invoked = (XLuaManager)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    UnityEngine.MonoBehaviour _view = (UnityEngine.MonoBehaviour)translator.GetObject(L, 2, typeof(UnityEngine.MonoBehaviour));
+                    string _luaScript = LuaAPI.lua_tostring(L, 3);
+                    string _monoName;
+                    
+                        var gen_ret = gen_to_be_invoked.GetScriptEnv( _view, _luaScript, out _monoName );
+                        translator.Push(L, gen_ret);
+                    LuaAPI.lua_pushstring(L, _monoName);
+                        
+                    
+                    
+                    
+                    return 2;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
         
         
         
@@ -403,7 +439,36 @@ namespace XLua.CSObjectWrap
             return 1;
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get__watch(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                XLuaManager gen_to_be_invoked = (XLuaManager)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked._watch);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
         
+        
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set__watch(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                XLuaManager gen_to_be_invoked = (XLuaManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked._watch = (System.Diagnostics.Stopwatch)translator.GetObject(L, 2, typeof(System.Diagnostics.Stopwatch));
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
         
 		
 		

@@ -6,6 +6,7 @@
 print("Common main start...")
 
 -- 加载全局模块
+require "Common.CSUtil"
 require "Common.Tools.import"
 require "Common.LuaUtil"
 require "Common.TableUtil"

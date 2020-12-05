@@ -1,12 +1,13 @@
 ﻿<Properties StartupConfiguration="{46B8386F-E26F-08FD-CD0A-67B83B449A5D}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Framework/AssetBundle/AssetBundleManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/XLua/LuaMonoBehaviour.cs">
     <Files>
       <File FileName="Assets/Reporter/Reporter.cs" Line="2041" Column="2" />
-      <File FileName="Assets/Scripts/Framework/AssetBundle/AssetBundleManager.cs" Line="72" Column="41" />
-      <File FileName="Assets/Scripts/Framework/AssetBundle/Config/AssetsPathMapping.cs" Line="52" Column="97" />
+      <File FileName="Assets/Scripts/Framework/AssetBundle/AssetBundleManager.cs" Line="77" Column="33" />
+      <File FileName="Assets/Scripts/Framework/AssetBundle/Config/AssetsPathMapping.cs" Line="52" Column="22" />
       <File FileName="Assets/Scripts/Framework/AssetBundle/Config/AssetBundleConfig.cs" Line="18" Column="27" />
       <File FileName="Assets/Scripts/Framework/AssetBundle/Config/Manifest.cs" Line="26" Column="57" />
-      <File FileName="Assets/Scripts/Common/Utility/BuildUtils.cs" Line="10" Column="25" />
+      <File FileName="Assets/Scripts/Common/Utility/BuildUtils.cs" Line="9" Column="1" />
+      <File FileName="Assets/Scripts/XLua/LuaMonoBehaviour.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -21,8 +22,10 @@
                 <Node name="Framework" expanded="True">
                   <Node name="AssetBundle" expanded="True">
                     <Node name="Config" expanded="True" />
-                    <Node name="AssetBundleManager.cs" selected="True" />
                   </Node>
+                </Node>
+                <Node name="XLua" expanded="True">
+                  <Node name="LuaMonoBehaviour.cs" selected="True" />
                 </Node>
               </Node>
             </Node>

@@ -1,0 +1,49 @@
+﻿<Properties StartupConfiguration="{B1DD91AC-C98B-AA8F-A943-C76A8913A3BD}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Uqee/Logic/MainRole/MainRole.cs">
+    <Files>
+      <File FileName="Assets/OtherPlugins/PathologicalGames/PoolManager/PoolManager.cs" Line="315" Column="1" />
+      <File FileName="Assets/OtherPlugins/PathologicalGames/PoolManager/SpawnPool.cs" Line="200" Column="24" />
+      <File FileName="Assets/Uqee/Cache/InstantiateCache.cs" Line="99" Column="31" />
+      <File FileName="Assets/Uqee/Utility/Manager/SceneLoadManager.cs" Line="219" Column="54" />
+      <File FileName="Assets/Uqee/Global/RESOURCE_CATEGORY.cs" Line="4" Column="25" />
+      <File FileName="Assets/Uqee/Logic/MainRole/MainRole.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="5. OR C-Bumper Ball OR" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="OtherPlugins" expanded="True">
+                <Node name="PathologicalGames" expanded="True">
+                  <Node name="PoolManager" expanded="True" />
+                </Node>
+              </Node>
+              <Node name="Uqee" expanded="True">
+                <Node name="Cache" expanded="True" />
+                <Node name="Global" expanded="True" />
+                <Node name="Logic" expanded="True">
+                  <Node name="MainRole" expanded="True">
+                    <Node name="MainRole.cs" selected="True" />
+                  </Node>
+                </Node>
+                <Node name="Utility" expanded="True">
+                  <Node name="Manager" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="9f45f376-ace2-4cfd-a98e-6124d373f0bd" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/admin/Documents/5. OR C-Bumper Ball OR/Assets/OtherPlugins/PathologicalGames/PoolManager/PoolManager.cs" relfile="Assets/OtherPlugins/PathologicalGames/PoolManager/PoolManager.cs" line="226" column="1" />
+      <Breakpoint file="/Users/admin/Documents/5. OR C-Bumper Ball OR/Assets/OtherPlugins/PathologicalGames/PoolManager/PoolManager.cs" relfile="Assets/OtherPlugins/PathologicalGames/PoolManager/PoolManager.cs" line="430" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

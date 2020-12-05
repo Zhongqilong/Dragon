@@ -37,6 +37,9 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(GameLaunch), GameLaunchWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(LuaMonoBehaviour), LuaMonoBehaviourWrap.__Register);
+        
+        
             translator.DelayWrapLoader(typeof(System.IO.BinaryWriter), SystemIOBinaryWriterWrap.__Register);
         
         
@@ -171,13 +174,13 @@ namespace XLua.CSObjectWrap
         
             translator.DelayWrapLoader(typeof(UnityEngine.SkinnedMeshRenderer), UnityEngineSkinnedMeshRendererWrap.__Register);
         
-        
-            translator.DelayWrapLoader(typeof(UnityEngine.Renderer), UnityEngineRendererWrap.__Register);
-        
         }
         
         static void wrapInit1(LuaEnv luaenv, ObjectTranslator translator)
         {
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Renderer), UnityEngineRendererWrap.__Register);
+        
         
             translator.DelayWrapLoader(typeof(System.Collections.Generic.List<int>), SystemCollectionsGenericList_1_SystemInt32_Wrap.__Register);
         
@@ -328,14 +331,19 @@ namespace XLua.CSObjectWrap
         
             translator.DelayWrapLoader(typeof(System.GC), SystemGCWrap.__Register);
         
+        }
+        
+        static void wrapInit2(LuaEnv luaenv, ObjectTranslator translator)
+        {
         
             translator.DelayWrapLoader(typeof(UnityEngine.AsyncOperation), UnityEngineAsyncOperationWrap.__Register);
         
+        
+            translator.DelayWrapLoader(typeof(Logger), LoggerWrap.__Register);
+        
+        
+        
         }
-        
-        
-        
-        
         
         static void Init(LuaEnv luaenv, ObjectTranslator translator)
         {
@@ -344,6 +352,10 @@ namespace XLua.CSObjectWrap
             
             wrapInit1(luaenv, translator);
             
+            wrapInit2(luaenv, translator);
+            
+            
+            translator.AddInterfaceBridgeCreator(typeof(LuaMonoInterface), LuaMonoInterfaceBridge.__Create);
             
             translator.AddInterfaceBridgeCreator(typeof(System.Collections.IEnumerator), SystemCollectionsIEnumeratorBridge.__Create);
             

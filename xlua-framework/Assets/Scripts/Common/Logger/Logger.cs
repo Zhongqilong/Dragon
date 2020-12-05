@@ -68,6 +68,10 @@ public class Logger
 #endif
     }
 
+    static public void LogError(object o)
+    {
+        Debug.LogError(o);
+    }
     public static void LogErrorToMainThread(string s, params object[] p)
     {
         string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);

@@ -52,6 +52,7 @@
 		<type fullname="UINoticeTip" preserve="all"/>
 		<type fullname="AssetbundleUpdater" preserve="all"/>
 		<type fullname="GameLaunch" preserve="all"/>
+		<type fullname="LuaMonoBehaviour" preserve="all"/>
 		<type fullname="BinaryWriterExtentions" preserve="all"/>
 		<type fullname="UnityEngineObjectExtention" preserve="all"/>
 		<type fullname="XLuaHelper" preserve="all"/>
@@ -75,6 +76,7 @@
 		<type fullname="ETCButton" preserve="all"/>
 		<type fullname="ETCInput" preserve="all"/>
 		<type fullname="ETCJoystick" preserve="all"/>
+		<type fullname="Logger" preserve="all"/>
 		
 	</assembly>
 

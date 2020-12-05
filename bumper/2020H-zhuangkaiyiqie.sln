@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{D4DA7A37-6B86-C7A9-67EF-07DC75D5B77A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitJson", "LitJson.csproj", "{666213AA-970E-CDA2-5FA2-ECEE8F4C5171}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOTween.Modules", "DOTween.Modules.csproj", "{DAF8E6AF-5D87-8AD8-5AB7-297AA201894E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4DA7A37-6B86-C7A9-67EF-07DC75D5B77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4DA7A37-6B86-C7A9-67EF-07DC75D5B77A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4DA7A37-6B86-C7A9-67EF-07DC75D5B77A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4DA7A37-6B86-C7A9-67EF-07DC75D5B77A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{666213AA-970E-CDA2-5FA2-ECEE8F4C5171}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{666213AA-970E-CDA2-5FA2-ECEE8F4C5171}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{666213AA-970E-CDA2-5FA2-ECEE8F4C5171}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{666213AA-970E-CDA2-5FA2-ECEE8F4C5171}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAF8E6AF-5D87-8AD8-5AB7-297AA201894E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAF8E6AF-5D87-8AD8-5AB7-297AA201894E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAF8E6AF-5D87-8AD8-5AB7-297AA201894E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAF8E6AF-5D87-8AD8-5AB7-297AA201894E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
