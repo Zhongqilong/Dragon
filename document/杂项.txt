@@ -627,3 +627,7 @@ Unity3D性能优化：ShaderLab内存占用 https://zhuanlan.zhihu.com/p/2733620
 由于美术在制作过程中对Prefab中对模型另外赋予材质，所以实际上，默认创建的材质（Standard）是没有使用到的。可是当加载模型的时候，却又把默认创建的材质加载上了，并对着色器解析了。因此导致内存中有Standard。
 那么解决方法也很简单，把“Import Materials”去掉，并把没有使用的默认材质删除
 
+https://stackoverflow.com/questions/3726143/svn-script-to-commit-a-set-of-deleted-files svn script to commit a set of deleted files
+svn st | grep ! | sed 's/!\s*//' | xargs -I{} svn remove '{}'
+for i in $(svn st | grep \! | awk '{print $2}'); do svn delete $i'@'; done
+svn st | grep ! | sed 's/^.*C\ //g' | xargs -I{} svn remove '{}'

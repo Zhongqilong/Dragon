@@ -1,15 +1,15 @@
 
 Logger.Log("test-------------------")
 
-function Start()
+local function Start()
     Logger.Log("Start-------------------")
 end
 
-function Awake()
+local function Awake()
     Logger.Log("Awake-------------------")
 end
 
-function OnDestroy()
+local function OnDestroy()
     Logger.Log("OnDestroy-------------------")
 end
 
