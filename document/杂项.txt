@@ -631,3 +631,25 @@ https://stackoverflow.com/questions/3726143/svn-script-to-commit-a-set-of-delete
 svn st | grep ! | sed 's/!\s*//' | xargs -I{} svn remove '{}'
 for i in $(svn st | grep \! | awk '{print $2}'); do svn delete $i'@'; done
 svn st | grep ! | sed 's/^.*C\ //g' | xargs -I{} svn remove '{}'
+
+反编译dll dnspy
+
+mipmap采样 https://www.zhihu.com/question/329521044/answer/1286662690
+想象一下，你有一个Quad，摄像机的位置又刚好在一个不错的位置，Texture的texel刚好和屏幕上的pixel一一对应，这是一种完美的情况。那么假如这个Quad离摄像机非常远呢，这种情况下你在屏幕上占用的pixel就非常小了，可你的texture还是那么大，结果就是你屏幕上的那块区域因为采样不足，有明显的走样。那么解决方案就很明显了，既然一个pixel覆盖了多个texel，我增加采样不就ok了，没错，我们为远处的一个像素进行多次采样，计算出来它最终的颜色。
+
+grep -C 5 foo file 显示file文件里匹配foo字串那行以及上下5行
+grep -B 5 foo file 显示foo及前5行
+grep -A 5 foo file 显示foo及后5行
+
+// 放弃当前修改
+svn revert -R .
+// 更新
+svn up
+// 查看最近5条svn log日志
+svn log -l 5
+// 从r608回滚到r602
+svn merge -r 608:602 ""
+
+https://mp.weixin.qq.com/s/oSd4sfEo8JBadTi-YHR3vQ
+对GPU来说，处理类似于“if-else”结构的分支语句不是它的强项，GPU的特点和功能决定了它更适合去并列地“执行”重复性的任务，而不是去“选择”。所以Shader变体的存在就很好地解决了这个问题，GPU只需要根据关键字去执行对应的Variant内容就可以，避免了性能下降的可能。同时，项目在运行时，可以通过在代码中选择不同的Shader变体，从而动态地改变着色器功能。
+
