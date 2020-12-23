@@ -631,6 +631,7 @@ https://stackoverflow.com/questions/3726143/svn-script-to-commit-a-set-of-delete
 svn st | grep ! | sed 's/!\s*//' | xargs -I{} svn remove '{}'
 for i in $(svn st | grep \! | awk '{print $2}'); do svn delete $i'@'; done
 svn st | grep ! | sed 's/^.*C\ //g' | xargs -I{} svn remove '{}'
+find . | grep .meta | xargs -I{} rm '{}'
 
 反编译dll dnspy
 
@@ -652,4 +653,38 @@ svn merge -r 608:602 ""
 
 https://mp.weixin.qq.com/s/oSd4sfEo8JBadTi-YHR3vQ
 对GPU来说，处理类似于“if-else”结构的分支语句不是它的强项，GPU的特点和功能决定了它更适合去并列地“执行”重复性的任务，而不是去“选择”。所以Shader变体的存在就很好地解决了这个问题，GPU只需要根据关键字去执行对应的Variant内容就可以，避免了性能下降的可能。同时，项目在运行时，可以通过在代码中选择不同的Shader变体，从而动态地改变着色器功能。
+
+粒子
+单个特效渲染数据限制：
+小型特效（如受击特效、Buff特效）的面数和顶点数在80以内，贴图在64*64以内，材质数2个以内。
+中型特效（如技能特效）的面数和顶点数在150以内，贴图在128*128以内，材质数4个以内。
+大型特效（如全局特效、大火球）的面数和顶点数在300以内，贴图在256*256以内，材质数6个以内。
+
+1. 少用Alpha Blend。开启Alpha Blend了一般会关闭深度测试，无法利用深度测试剔除多余片元，导致片元数量增加，造成过绘制。所以要尽量少用。
+2. 禁用Alpha Test。现代部分移动端GPU采用了特殊的渲染优化方式，如PowerVR采用Tile Based Deferred Rendering方式（下图右），而Alpha Test会破坏Early-Z优化技术，可用Alpha Blend代替。更多看这里。
+
+https://blog.csdn.net/leonwei/article/details/77387357
+GPU Skin还可以结合GPU Instance技术，以渲染大量相同角色的骨骼动画。
+
+　　引发卡顿的原因有很多，但主要有：
+　　1. 突发大量IO。
+　　2. 短时大量内存操作。
+　　3. 渲染物体突然暴涨。
+　　4. 触发GC。
+　　5. 加载资源量多的场景或界面。
+　　6. 触发过多过复杂的逻辑。
+
+
+Rawlmage组件和Image组件类似，都是UGUI系统下的图像组件。针对于Texutre设置的TextureType来说，Image组件只能使用TextureType为Sprite类型的资源；而RawImage使用的纹理资源可以设置为任意Type，需要注意的是，如果在RawImage组件内拖入的是TextureType为Sprite的纹理，其实是引用了Sprite内的原始纹理。从UGUI源码中看，RawImage类型的API函数很少，功能比较简单，而Image类型的功能较复杂。
+
+Unity windows平台pc包exe文件的运行log或者崩溃日志位置
+Windows C:\Users\username\AppData\LocalLow\CompanyName\ProductName\Player.log
+或者
+Windows C:\Users\username\AppData\LocalLow\CompanyName\ProductName\output_log.txt
+
+
+比较TCP和UDP，为什么TCP要三次握手及为什么四次挥手，如何实现可靠有序UDP topk问题
+
+
+
 
