@@ -686,5 +686,17 @@ Windows C:\Users\username\AppData\LocalLow\CompanyName\ProductName\output_log.tx
 比较TCP和UDP，为什么TCP要三次握手及为什么四次挥手，如何实现可靠有序UDP topk问题
 
 
+lamda 协程优缺点
+
+xlua gc
+
+spine优化
+
+Unity匿名函数的堆内存优化
+我们先从没有产生alloc的函数开始分析。 这个函数没有使用外部变量，那么编译器就会把这个函数变成一个静态函数。 在调用的时候才会new出来，但一旦new出来之后就不会再new了，这就是它为什么没有alloc的原因。
+其他会产生的alloc的函数，都是成员函数（包括匿名的，也变成成员的了），所以每次都会new一个action对象。
+当不使用外部变量的匿名函数时，编译器会把这个函数变成静态函数，在首次调用时初始化，之后就再也不会new新的对象。 当使用外部变量时，每次调用都会生成一个临时action变量，这个就是alloc的原因。
+
+
 
 
