@@ -632,6 +632,7 @@ svn st | grep ! | sed 's/!\s*//' | xargs -I{} svn remove '{}'
 for i in $(svn st | grep \! | awk '{print $2}'); do svn delete $i'@'; done
 svn st | grep ! | sed 's/^.*C\ //g' | xargs -I{} svn remove '{}'
 find . | grep .meta | xargs -I{} rm '{}'
+svn st | grep ? | sed 's/?\s*//' | xargs -I{} rm -rf '{}'
 
 反编译dll dnspy
 
@@ -739,4 +740,10 @@ Unity匿名函数的堆内存优化
 粒子系统的Draw Call动态拼合与半透明物体的动态拼合机制相当（粒子基本都是半透明材质）。而对半透明物体，由于其渲染顺序的限制（必须从后向前渲染，以保证渲染结果的正确性），动态拼合只能对渲染顺序相邻且材质相同的物体有效。而在决定半透明物体的渲染顺序时，Unity首先会按Shader中的RenderQueue进行排序；其次（相同RenderQueue时），会根据每个半透明物件到屏幕的距离，距离大的优先渲染。
 
 因此，需要尽可能地将相同材质的粒子系统放在比较接近的深度下，才能更多地使动态拼合生效。但通常由于相机的运动、粒子系统的分散分布等原因造成粒子系统之间的穿插，能够动态拼合的数量往往都是很少的，所以我们在粒子系统模块看到的开销分布通常类似该图，主要都是未拼合粒子系统造成。
+
+
+指针、引用、数组、内存引用与指针区别C 和 C++ 的一些区别，比如 new、delete 和 malloc、free 的区别虚机制：虚函数、虚函数表、纯虚函数继承、虚继承、菱形继承等多态： 动态绑定，静态多态重写、重载智能指针原理：引用计数、RAII（资源获取即初始化）思想智能指针使用：shared_ptr、weak_ptr、unique_ptr一些关键字的作用：static、const、volatile、extern四种类型转换：static_cast, dynamic_cast, const_cast, reinterpret_castSTL部分容器的实现原理，如 vector、deque、map、hashmap模板特化、偏特化，萃取 traits 技巧编译链接机制、内存布局（memory layout）、对象模型C++11 部分新特性，比如右值引用、完美转发等
+
+操作系统由哪些构成进程的状态、切换、调度进程间通信方式（共享内存、管道、消息）进程和线程的区别线程的实现方式（一对一、多对一等）互斥与同步（信号量、管程、锁）死锁检测与避免并发经典的问题：读者写者、哲学家就餐问题为什么需要虚拟内存，MMU 具体如何做地址转换的内存为什么分段、分页页面置换算法文件系统是如何组织的虚拟文件系统（VFS）是如何抽象的
+
 
